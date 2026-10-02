@@ -1,0 +1,7 @@
+company,technology,milestone,date_or_target
+Google,Superconducting,"Willow, 105 qubits: errors drop as the code grows (below threshold)",2024-12
+IBM,Superconducting,"Nighthawk, 120 qubits; Starling target: 200 logical qubits, 100M gates",2029 target
+"IonQ, Quantinuum",Trapped ion,"Highest two-qubit gate fidelities, reported up to 99.99%",2025-2026
+"Pasqal, QuEra",Neutral atom,"Hundreds of qubits; logical beats physical qubits on a differential-equation task",2026-05
+NIST,Policy,Post-quantum cryptography standards published,2024
+US government,Policy,Executive order targets a fault-tolerant machine by 2028,2026-06

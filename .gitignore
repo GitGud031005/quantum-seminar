@@ -1,0 +1,13 @@
+# Textbook PDF: copyrighted, keep local only
+material/*.pdf
+
+# Python
+__pycache__/
+*.pyc
+
+# Tooling and OS
+node_modules/
+.codegraph/
+.claude/settings.local.json
+Thumbs.db
+.DS_Store

@@ -1,0 +1,9 @@
+experiment,outcome,count,probability
+product,00,267,0.2607
+product,01,272,0.2656
+product,10,236,0.2305
+product,11,249,0.2432
+bell,00,503,0.4912
+bell,01,0,0.0
+bell,10,0,0.0
+bell,11,521,0.5088

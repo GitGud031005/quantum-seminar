@@ -1,0 +1,5 @@
+model,test_accuracy,setting
+"Quantum kernel (ZZ feature map, tuned)",0.9,scale=0.3
+"Quantum kernel (ZZ feature map, untuned)",0.775,scale=1.0
+Linear SVM,0.925,
+RBF SVM (tuned),0.975,gamma=3

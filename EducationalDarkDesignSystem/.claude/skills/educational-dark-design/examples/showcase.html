@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Educational Dark — Layout Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;500;600;700&family=Lato:wght@400;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   EDUCATIONAL DARK SLIDES — DESIGN SYSTEM v1
+   Source: "Choosing a Career for Students" (Slidesgo), slides 1–35 + 45.
+   Canvas: 960 × 540 px (16:9) = the PPTX canvas exactly. 1pt = 1.333px.
+   DO NOT edit tokens per deck. Only add slide-specific rules at the bottom,
+   inside the marked "DECK-SPECIFIC" block, and only using the tokens.
+   ========================================================================== */
+:root{
+  /* ---- Color (the whole palette — nothing else is allowed) ---- */
+  --navy:  #0D1030;   /* canvas (every slide), holes in donuts, stripe gaps */
+  --cyan:  #79E0FF;   /* titles, item headings, lines, motifs */
+  --blue:  #0F5AFF;   /* motifs, chart series, highlight fills */
+  --grey:  #C2C2C2;   /* step / section numbers, secondary values */
+  --white: #FFFFFF;   /* body text, motifs */
+
+  /* ---- Type ---- */
+  --font-display: 'Signika', Arial, sans-serif;               /* titles, headings, numbers */
+  --font-body:    'Lato', Arial, sans-serif;                   /* body, captions */
+  --fs-xs:   13.33px;  /* 10pt  footnotes, chart axis, month labels */
+  --fs-sm:   16px;     /* 12pt  dense body, captions */
+  --fs-body: 18.67px;  /* 14pt  body text (default) */
+  --fs-lead: 21.33px;  /* 16pt  subtitles under display text */
+  --fs-h4:   24px;     /* 18pt  table headers, compact labels */
+  --fs-h3:   29.33px;  /* 22pt  item heading */
+  --fs-stat: 40px;     /* 30pt  step numbers, percentages, table values */
+  --fs-h2:   46.67px;  /* 35pt  slide title */
+  --fs-sec:  50.67px;  /* 38pt  section title */
+  --fs-d3:   64px;     /* 48pt  statement */
+  --fs-cv:   69.33px;  /* 52pt  cover title */
+  --fs-d2:   80px;     /* 60pt  section number, "Whoa!", "Cảm ơn!" */
+  --fs-d1:   96px;     /* 72pt  big number */
+  --lh-tight: 1.05;
+  --lh-title: 1.12;
+  --lh-body:  1.25;
+
+  /* ---- Grid ---- */
+  --W: 960px; --H: 540px;
+  --mx: 75px;          /* title box edge */
+  --title-top: 47px;
+  --u: 88px;           /* motif tile (all decorative clusters are built from it) */
+}
+/* Lato has no Vietnamese glyphs (ạ, ế, ộ…). Vietnamese decks swap to the closest humanist sans that has them. */
+:root:lang(vi){--font-body:'Nunito Sans', Arial, sans-serif}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--navy)}
+body{font-family:var(--font-body);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ---------------- Slide canvas ---------------- */
+.deck{position:absolute;left:0;top:0;width:var(--W);height:var(--H);transform-origin:0 0}
+.slide{position:absolute;inset:0;width:var(--W);height:var(--H);overflow:hidden;background:var(--navy);
+  color:var(--white);font-family:var(--font-body);font-size:var(--fs-body);line-height:var(--lh-body);display:none}
+.slide.active{display:block}
+
+/* ---------------- Text primitives ---------------- */
+.title{position:absolute;left:var(--mx);top:var(--title-top);width:810px;height:60px;display:flex;align-items:center;justify-content:center;
+  text-align:center;font-family:var(--font-display);font-size:var(--fs-h2);font-weight:700;line-height:var(--lh-title);color:var(--cyan);z-index:1}
+.h3{font-family:var(--font-display);font-size:var(--fs-h3);font-weight:700;color:var(--cyan);line-height:1.1}
+.h4{font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--cyan);line-height:1.1}
+.num{font-family:var(--font-display);font-size:var(--fs-stat);font-weight:700;color:var(--grey);line-height:1}
+.stat{font-family:var(--font-display);font-size:var(--fs-stat);font-weight:700;color:var(--white);line-height:1}
+.sm{font-size:var(--fs-sm)} .xs{font-size:var(--fs-xs)}
+.hl{color:var(--white)}               /* highlight a keyword inside cyan display text */
+b,strong{font-weight:700;color:var(--cyan)}
+.center{text-align:center} .right{text-align:right} .left{text-align:left}
+.ul{list-style:none}
+.ul li{position:relative;padding-left:1.4em}
+.ul li::before{content:"";position:absolute;left:.3em;top:.45em;width:.4em;height:.4em;border-radius:50%;background:var(--cyan)}
+.ul li li::before{background:transparent;border:1.5px solid var(--cyan)}
+.ul li+li{margin-top:.35em}
+.ul ul{list-style:none;margin-top:.25em}
+.it .h3,.it .h4{margin-bottom:6px}
+.zz{position:absolute;inset:0}       /* item layer: positional layouts count items inside it only */
+.it .num{margin-bottom:10px}
+.slide > :not(.deco){z-index:1}
+
+/* ---------------- Decorative motifs ----------------
+   Exact vector shapes from the PPTX layouts, stored once in the sprite at the top of <body>.
+   A slide places them with <svg class="deco" style="left/top/width/height"><use href="#m…"/></svg>,
+   copied verbatim from its snippet. Boxes may extend past the canvas; the slide clips them. */
+.deco{position:absolute;display:block;overflow:visible;z-index:0;pointer-events:none}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ---------------- Components ---------------- */
+.photo{display:block;width:100%;height:100%;object-fit:cover}              /* warm, natural photos stay in color */
+.shot{display:block;width:100%;height:100%;object-fit:cover;background:var(--white)} /* product screenshots */
+.ph{width:100%;height:100%;border:2px dashed var(--grey);display:flex;align-items:center;justify-content:center;
+  color:var(--grey);font-size:var(--fs-sm);font-weight:700;text-align:center;padding:10px}
+.icon{width:40px;height:40px;stroke:var(--cyan);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dot{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--cyan);vertical-align:middle}
+.dot.blue{background:var(--blue)} .dot.grey{background:var(--grey)} .dot.white{background:var(--white)}
+/* SVG paint helpers — never hard-code hex inside SVG, use these */
+.s-navy{stroke:var(--navy)} .s-cyan{stroke:var(--cyan)} .s-blue{stroke:var(--blue)} .s-grey{stroke:var(--grey)} .s-white{stroke:var(--white)}
+.f-navy{fill:var(--navy)} .f-cyan{fill:var(--cyan)} .f-blue{fill:var(--blue)} .f-grey{fill:var(--grey)} .f-white{fill:var(--white)} .f-none{fill:none}
+svg text{font-family:var(--font-body)}
+.node{display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 14px;min-height:44px;line-height:1.15;
+  border:2px solid var(--cyan);color:var(--white)}
+.node.blue{background:var(--blue);border-color:var(--blue);font-weight:700}
+.node.cyan{background:var(--cyan);color:var(--navy);font-weight:700}
+.tbl{border-collapse:collapse;width:100%}
+.tbl th,.tbl td{border:1.5px solid var(--cyan);padding:8px 12px;text-align:center;vertical-align:middle;line-height:1.2}
+.tbl th{font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--cyan)}
+.tbl td{font-size:var(--fs-sm);color:var(--white)}
+.tbl td.v{font-family:var(--font-display);font-size:var(--fs-h3);font-weight:700;color:var(--grey)}
+.tbl .rh{font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--cyan)}
+
+/* ===================== LAYOUTS ===================== */
+/* Absolute regions below mirror the PPTX placeholder boxes (px). */
+
+/* 01 cover */
+.l-cover .cv{position:absolute;left:144px;top:96px;width:672px;height:348px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.l-cover .cv-title{font-family:var(--font-display);font-size:var(--fs-cv);font-weight:700;line-height:var(--lh-tight);color:var(--cyan)}
+.l-cover .cv-sub{font-size:var(--fs-lead)}
+.l-cover .cv-meta{margin-top:10px;font-size:var(--fs-sm);line-height:1.4;color:var(--grey)}
+.l-cover .cv-meta b{color:var(--white)}
+
+/* 02 toc */
+.l-toc .toc{position:absolute;left:80px;top:125px;width:800px;height:320px;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:26px 25px}
+.l-toc .it{width:242px;text-align:center}
+.l-toc .it p{font-size:var(--fs-sm)}
+
+/* 03 whoa (big word + line) */
+.l-whoa .big{position:absolute;left:204px;top:150px;width:552px;height:146px;display:flex;align-items:flex-end;justify-content:center;text-align:center;
+  font-family:var(--font-display);font-size:var(--fs-d2);font-weight:700;line-height:1;color:var(--cyan)}
+.l-whoa .sub{position:absolute;left:224px;top:310px;width:512px;text-align:center;font-size:var(--fs-lead)}
+
+/* 04 section (centered) + .alt (number left, text left-aligned) */
+.l-section .sec-num{position:absolute;left:393px;top:130px;width:173px;height:96px;display:flex;align-items:flex-end;justify-content:center;
+  font-family:var(--font-display);font-size:var(--fs-d2);font-weight:700;color:var(--grey);line-height:1}
+.l-section .sec-title{position:absolute;left:217px;top:236px;width:527px;text-align:center;font-family:var(--font-display);font-size:var(--fs-sec);font-weight:700;color:var(--cyan);line-height:1.1}
+.l-section .sec-sub{position:absolute;left:247px;top:310px;width:467px;text-align:center;font-size:var(--fs-lead)}
+.l-section.alt .sec-num{left:186px;top:206px;height:89px;justify-content:flex-end;padding-right:20px}
+.l-section.alt .sec-title{left:360px;top:214px;width:470px;text-align:left}
+.l-section.alt .sec-sub{left:360px;top:288px;width:470px;text-align:left}
+
+/* 05 text2 (title + two centered paragraphs) */
+.l-text2 .paras{position:absolute;left:209px;top:140px;width:543px;height:320px;display:flex;flex-direction:column;justify-content:center;gap:28px;text-align:center}
+
+/* 06 bullets */
+.l-bullets .body{position:absolute;left:0;right:0;margin:0 auto;top:140px;width:fit-content;max-width:490px;height:300px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+
+/* 07 steps (4 numbered columns) */
+.l-steps .cols{position:absolute;left:78px;top:136px;width:804px;display:grid;grid-template-columns:repeat(var(--n,4),1fr);text-align:center}
+.l-steps .it{padding:0 10px}
+.l-steps .it .num{margin-bottom:26px}
+
+/* 08 zigzag 2 / 3 / 4 items (staggered heading + text) */
+.l-zig .it{position:absolute;text-align:center}
+.l-zig.n2 .it{width:372px} .l-zig.n2 .it:nth-of-type(1){left:98px;top:165px} .l-zig.n2 .it:nth-of-type(2){left:490px;top:253px}
+.l-zig.n3 .it{width:228px} .l-zig.n3 .it:nth-of-type(1){left:98px;top:189px} .l-zig.n3 .it:nth-of-type(2){left:366px;top:293px} .l-zig.n3 .it:nth-of-type(3){left:633px;top:189px}
+.l-zig.n4 .it{width:228px} .l-zig.n4 .it:nth-of-type(1){left:289px;top:170px} .l-zig.n4 .it:nth-of-type(2){left:598px;top:170px}
+.l-zig.n4 .it:nth-of-type(3){left:134px;top:310px} .l-zig.n4 .it:nth-of-type(4){left:443px;top:310px}
+
+/* 09 five items (3 + 2) */
+.l-five .grid{position:absolute;left:100px;top:140px;width:760px;display:flex;flex-wrap:wrap;justify-content:center;gap:34px 36px}
+.l-five .it{width:228px;text-align:center}
+
+/* 10 statement */
+.l-statement .big{position:absolute;left:151px;top:165px;width:658px;height:210px;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--font-display);font-size:var(--fs-d3);font-weight:700;line-height:1.08;color:var(--cyan)}
+/* 10b focus: eyebrow + the key idea + follow-up, one centred block (used with .accent) */
+.l-statement .st{position:absolute;left:120px;top:96px;width:720px;height:348px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.l-statement .st .big{position:static;width:auto;height:auto;font-size:var(--fs-sec);line-height:1.1}
+.l-statement .eyebrow{font-size:var(--fs-lead);font-weight:700}
+.l-statement .rule{width:64px;height:5px;background:var(--cyan)}
+.l-statement .sub{font-size:var(--fs-lead)}
+
+/* Accent (pacing): a blue canvas marks the pause on the one idea the audience must remember.
+   Motif parts drawn in blue turn navy so they stay visible; all text turns white. */
+.slide.accent{background:var(--blue)}
+.slide.accent .deco{--blue:var(--navy)}
+.slide.accent .big,.slide.accent .qt,.slide.accent .by,.slide.accent b,.slide.accent .hl{color:var(--white)}
+
+/* 11 quote */
+.l-quote .qw{position:absolute;left:129px;top:92px;width:702px;height:356px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.l-quote .qt{font-size:var(--fs-stat);line-height:1.2;color:var(--white)}
+.l-quote .by{font-family:var(--font-display);font-size:var(--fs-h3);font-weight:700;color:var(--cyan)}
+
+/* 12 photo (full-bleed + caption band) */
+.l-photo .bg{position:absolute;inset:0;z-index:0}
+.l-photo .cap{position:absolute;left:183px;top:421px;width:594px;height:60px;display:flex;align-items:center;justify-content:center;text-align:center;
+  background:var(--navy);font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--cyan);padding:0 20px}
+
+/* 13 photo + text */
+.l-phototext .txt{position:absolute;left:100px;top:79px;width:400px;height:360px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:18px}
+.l-phototext .txt .tt{font-family:var(--font-display);font-size:var(--fs-h2);font-weight:700;line-height:var(--lh-title);color:var(--cyan)}
+.l-phototext .pic{position:absolute;left:521px;top:90px;width:340px;height:340px}
+
+/* 14 big number */
+.l-bignum .num{position:absolute;left:180px;top:150px;width:600px;height:150px;display:flex;align-items:flex-end;justify-content:center;
+  font-size:var(--fs-d1);color:var(--cyan)}
+.l-bignum .cap{position:absolute;left:255px;top:312px;width:450px;text-align:center;font-size:var(--fs-lead)}
+
+/* 15 stats (3 values) */
+.l-stats .it{position:absolute;width:411px;text-align:center}
+.l-stats .it .v{font-family:var(--font-display);font-size:var(--fs-sec);font-weight:700;color:var(--cyan);line-height:1.05;margin-bottom:8px}
+.l-stats .it:nth-of-type(1){left:63px;top:150px} .l-stats .it:nth-of-type(2){left:486px;top:150px} .l-stats .it:nth-of-type(3){left:275px;top:300px}
+
+/* 16 donuts (3 percentages, middle one flipped) */
+.l-donuts .col{position:absolute;top:135px;width:228px;height:320px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:6px}
+.l-donuts .col:nth-of-type(1){left:99px} .l-donuts .col:nth-of-type(2){left:366px;justify-content:flex-end} .l-donuts .col:nth-of-type(3){left:633px}
+.l-donuts .ring{width:96px;height:96px;margin:4px 0 8px}
+.l-donuts .col:nth-of-type(2) .ring{margin:8px 0 0}
+.l-donuts .col p{font-size:var(--fs-sm)}
+
+/* 17 pie (donut chart + legend) */
+.l-pie .chart{position:absolute;left:95px;top:130px;width:320px;height:300px}
+.l-pie .legend{position:absolute;left:480px;top:135px;width:400px;display:flex;flex-direction:column;gap:22px}
+.l-pie .row{display:grid;grid-template-columns:30px 110px 1fr;align-items:center;column-gap:10px}
+.l-pie .row .h4{margin-bottom:2px}
+.l-pie .foot{position:absolute;left:103px;top:448px;width:754px;text-align:center;font-size:var(--fs-xs);color:var(--grey)}
+
+/* 18 computer mockup + text */
+.l-computer .mon{position:absolute;left:88px;top:130px;width:420px}
+.l-computer .mon .scr{height:246px;border:12px solid var(--cyan);background:var(--white)}
+.l-computer .mon .neck{width:64px;height:30px;margin:0 auto;background:var(--blue)}
+.l-computer .mon .base{width:130px;height:8px;margin:0 auto;background:var(--cyan)}
+.l-computer .txt{position:absolute;left:552px;top:150px;width:300px;height:250px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px}
+
+/* 19 tablet mockup (landscape, centered) */
+.l-tablet .sub{position:absolute;left:200px;top:120px;width:560px;text-align:center}
+.l-tablet .tab{position:absolute;left:270px;top:200px;width:420px;height:258px;background:var(--blue);padding:18px 34px}
+.l-tablet .tab::before,.l-tablet .tab::after{content:"";position:absolute;top:50%;width:4px;height:64px;margin-top:-32px;background:var(--white)}
+.l-tablet .tab::before{left:14px} .l-tablet .tab::after{right:14px}
+
+/* 20 phone mockup + text */
+.l-phone .txt{position:absolute;left:120px;top:150px;width:420px;height:250px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px}
+.l-phone .txt .tt{font-family:var(--font-display);font-size:var(--fs-h2);font-weight:700;color:var(--cyan);line-height:var(--lh-title)}
+.l-phone .ph-frame{position:absolute;left:600px;top:90px;width:210px;height:380px;background:var(--cyan);padding:30px 12px 34px;border-radius:18px}
+.l-phone .ph-frame::before{content:"";position:absolute;left:50%;top:11px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--navy)}
+.l-phone .ph-frame::after{content:"";position:absolute;left:50%;bottom:13px;width:56px;height:7px;margin-left:-28px;background:var(--navy)}
+
+/* 21 table / comparison */
+.l-table .tblwrap{position:absolute;left:76px;top:116px;width:808px;height:334px;display:flex;flex-direction:column;justify-content:center}
+
+/* 21b figure (chart / diagram / textbook figure + side column) */
+.l-figure .fig{position:absolute;left:76px;top:116px;width:500px;height:310px;display:flex;align-items:center;justify-content:center;gap:24px}
+.l-figure .fig > svg,.l-figure .fig > img{max-width:100%;max-height:100%}
+.l-figure .figcap{position:absolute;left:76px;top:434px;width:500px;text-align:center;font-size:var(--fs-xs);color:var(--grey)}
+.l-figure .side{position:absolute;left:606px;top:116px;width:278px;height:330px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.l-figure .kv .v{font-family:var(--font-display);font-size:var(--fs-stat);font-weight:700;color:var(--cyan);line-height:1.05}
+.l-figure .kv p{font-size:var(--fs-sm)}
+.l-figure.alt .fig,.l-figure.alt .figcap{left:384px} .l-figure.alt .side{left:76px}
+.l-figure.wide .fig,.l-figure.wide .figcap{width:808px}
+.l-figure.portrait .fig,.l-figure.portrait .figcap{left:590px;width:294px} .l-figure.portrait .side{left:76px;width:480px}
+.l-figure .cell{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.l-figure .cell > svg,.l-figure .cell > img{max-width:100%;max-height:calc(100% - 34px)}
+.l-figure .cell .cap{font-size:var(--fs-xs);color:var(--grey);text-align:center}
+.fig-img{display:block;object-fit:contain}               /* charts / figures as images: never cropped */
+
+/* 22 timeline (5 numbers, labels alternate above / below) */
+.l-timeline .axis{position:absolute;left:120px;top:311px;width:720px;height:2px;background:var(--cyan)}
+.l-timeline .st{position:absolute;width:192px;height:360px;top:120px;text-align:center}
+.l-timeline .st .num{position:absolute;left:61px;top:162px;width:70px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--navy)}
+.l-timeline .st .it{position:absolute;left:0;width:192px}
+.l-timeline .st.up .it{bottom:228px} .l-timeline .st.dn .it{top:232px}
+.l-timeline .st .it p{font-size:var(--fs-sm)}
+.l-timeline .st:nth-of-type(1){left:83px} .l-timeline .st:nth-of-type(2){left:233px} .l-timeline .st:nth-of-type(3){left:384px}
+.l-timeline .st:nth-of-type(4){left:534px} .l-timeline .st:nth-of-type(5){left:685px}
+.l-timeline .st.up .it p{margin-bottom:4px}
+
+/* 23 hub (center + 6 around) */
+.l-hub .core{position:absolute;left:372px;top:228px;width:216px;height:92px;border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px}
+.l-hub .ln{position:absolute;background:var(--cyan)}
+.l-hub .it{position:absolute;width:228px}
+.l-hub .it p{font-size:var(--fs-sm)}
+.l-hub .it.top{left:366px;top:122px;text-align:center} .l-hub .it.bot{left:366px;top:358px;text-align:center}
+.l-hub .it.l1{left:100px;top:180px;text-align:right} .l-hub .it.l2{left:100px;top:300px;text-align:right}
+.l-hub .it.r1{left:632px;top:180px;text-align:left} .l-hub .it.r2{left:632px;top:300px;text-align:left}
+
+/* 24 stairs (4 ascending levels, text alternates sides) */
+.l-stairs .lv{position:absolute;width:128px;height:60px;border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--white);text-align:center;line-height:1.05}
+.l-stairs .it{position:absolute;width:230px}
+.l-stairs .it p{font-size:var(--fs-sm)}
+.l-stairs .lv:nth-of-type(1){left:338px;top:368px} .l-stairs .lv:nth-of-type(2){left:494px;top:298px}
+.l-stairs .lv:nth-of-type(3){left:338px;top:228px} .l-stairs .lv:nth-of-type(4){left:494px;top:158px}
+.l-stairs .it:nth-of-type(1){left:90px;top:360px;text-align:right} .l-stairs .it:nth-of-type(2){left:640px;top:290px}
+.l-stairs .it:nth-of-type(3){left:90px;top:220px;text-align:right} .l-stairs .it:nth-of-type(4){left:640px;top:150px}
+
+/* 25 gantt roadmap */
+.l-gantt .g{position:absolute;left:76px;top:140px;width:808px;display:grid;grid-template-columns:150px repeat(var(--m,6),1fr);column-gap:4px;row-gap:14px;align-items:center}
+.l-gantt .mo{font-size:var(--fs-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);text-align:center;padding-bottom:8px;border-bottom:2px solid var(--cyan)}
+.l-gantt .ph-l{grid-column:1;font-family:var(--font-display);font-size:var(--fs-h4);font-weight:700;color:var(--cyan);line-height:1.1}
+.l-gantt .bar{height:48px;display:flex;align-items:center;gap:14px;padding:0 14px;font-size:var(--fs-sm);background:var(--blue);color:var(--white);white-space:nowrap;overflow:hidden}
+.l-gantt .bar.cyan{background:var(--cyan);color:var(--navy)}
+
+/* 26 team */
+.l-team .grid{position:absolute;left:75px;top:120px;width:810px;height:330px;display:flex;align-items:center;justify-content:center;gap:var(--gap,26px)}
+.l-team .grid.five{--w:150px;--d:124px;--gap:14px}
+.l-team .m .h4{min-height:2.2em}              /* full Vietnamese names wrap to 2 lines; keeps roles aligned */
+.l-team .m{width:var(--w,170px);text-align:center}
+.l-team .m .face{width:var(--d,150px);height:var(--d,150px);margin:0 auto 14px;overflow:hidden}
+.l-team .m p{font-size:var(--fs-sm)}
+
+/* 27 thanks */
+.l-thanks .ty{position:absolute;left:180px;top:80px;width:600px;height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.l-thanks .big{margin-bottom:12px;font-family:var(--font-display);font-size:var(--fs-d2);font-weight:700;color:var(--cyan);line-height:1}
+.l-thanks .ask{font-size:var(--fs-lead);font-weight:700}
+.l-thanks .icons{display:flex;justify-content:center;gap:16px;margin-top:14px}
+
+/* 28 diagram (free canvas) */
+.l-diagram .stage{position:absolute;left:var(--mx);top:125px;width:810px;height:320px;display:flex;align-items:center;justify-content:center}
+
+/* ===================== DECK-SPECIFIC (keep tiny, tokens only) ===================== */
+
+/* ===================== Presentation shell (not part of the look) ===================== */
+.hud{position:fixed;right:14px;bottom:12px;font:700 12px/1 var(--font-body);color:rgba(255,255,255,.55);letter-spacing:.04em;user-select:none;z-index:9}
+body.overview{overflow:auto}
+body.overview .deck{position:static;transform:none!important;width:auto;height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding:18px}
+body.overview .slide{position:relative;display:block;zoom:.32;cursor:pointer;outline:2px solid rgba(255,255,255,.14)}
+body.overview .slide.active{outline:10px solid var(--cyan)}
+@media print{
+  @page{size:960px 540px;margin:0}
+  html,body{overflow:visible;height:auto}
+  .deck{position:static;transform:none!important;width:auto;height:auto}
+  .slide{position:relative;display:block!important;break-after:page;page-break-after:always}
+  .hud{display:none}
+}
+</style>
+</head>
+<body>
+<!-- Motif sprite: exact vector shapes of the PPTX layouts (do not edit; referenced by <svg class="deco"><use href="#…"/></svg>) -->
+<svg class="sprite" aria-hidden="true"><defs>
+<symbol id="m1a" viewBox="0 0 262.8 87.6"><path class="f-cyan" transform="matrix(0.6438 0 0 0.6438 0 0)" d="M136.1 136.1 L0 136.1 L0 0 L136.1 0 L136.1 136.1 Z"/><path class="f-white" transform="matrix(0.6438 0 0 0.6438 87.6 0)" d="M0 0 L272.1 0 L272.1 136.1 L0 136.1 L0 0 Z"/><path class="f-blue" transform="matrix(0.6438 0 0 0.6438 87.6 43.8)" d="M68 0 L272.2 0 L272.2 68 L0 68 L0 68 C0 30.5 30.5 0 68 0 Z"/><path class="f-cyan" transform="matrix(0.6438 0 0 0.6438 175.2 0)" d="M0 68 C0 30.5 30.5 0 68.1 0 C105.6 0 136.1 30.5 136.1 68 C136.1 105.6 105.6 136.1 68.1 136.1 C30.5 136.1 0 105.6 0 68 Z"/><path class="f-navy" transform="matrix(0.6438 0 0 0.6438 200.4 25.2)" d="M0 28.9 C0 12.9 12.9 0 28.9 0 C44.8 0 57.7 12.9 57.7 28.9 C57.7 44.8 44.8 57.8 28.9 57.8 C12.9 57.8 0 44.8 0 28.9 Z"/></symbol>
+<symbol id="m1b" viewBox="0 0 30.9 97.5"><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m1c" viewBox="0 0 164.2 164.2"><path class="f-cyan" transform="matrix(1.195 0 0 1.195 0 0)" d="M68.7 1.3 C31.6 1.3 1.3 31.5 1.3 68.7 C1.3 105.8 31.6 136.1 68.7 136.1 C105.8 136.1 136.1 105.8 136.1 68.7 C136.1 31.5 105.8 1.3 68.7 1.3 M68.7 137.4 C30.8 137.4 0 106.5 0 68.7 C0 30.8 30.8 0 68.7 0 C106.6 0 137.4 30.8 137.4 68.7 C137.4 106.5 106.6 137.4 68.7 137.4 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 6.1 6.1)" d="M63.6 1.6 C29.4 1.6 1.6 29.4 1.6 63.6 C1.6 97.8 29.4 125.6 63.6 125.6 C97.9 125.6 125.7 97.8 125.7 63.6 C125.7 29.4 97.9 1.6 63.6 1.6 M63.6 127.2 C28.5 127.2 0 98.7 0 63.6 C0 28.5 28.5 0 63.6 0 C98.7 0 127.2 28.5 127.2 63.6 C127.2 98.7 98.7 127.2 63.6 127.2 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 12.2 12.2)" d="M58.5 1.8 C27.3 1.8 1.8 27.3 1.8 58.5 C1.8 89.8 27.3 115.2 58.5 115.2 C89.8 115.2 115.2 89.8 115.2 58.5 C115.2 27.3 89.8 1.8 58.5 1.8 M58.5 117.1 C26.3 117.1 0 90.8 0 58.5 C0 26.2 26.3 0 58.5 0 C90.8 0 117.1 26.2 117.1 58.5 C117.1 90.8 90.8 117.1 58.5 117.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 18.2 18.2)" d="M53.4 2.1 C25.1 2.1 2 25.1 2 53.4 C2 81.8 25.1 104.8 53.4 104.8 C81.8 104.8 104.8 81.8 104.8 53.4 C104.8 25.1 81.8 2.1 53.4 2.1 M53.4 106.9 C24 106.9 0 82.9 0 53.4 C0 24 24 0 53.4 0 C82.9 0 106.8 24 106.8 53.4 C106.8 82.9 82.9 106.9 53.4 106.9 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 24.3 24.3)" d="M48.3 2.3 C23 2.3 2.3 22.9 2.3 48.3 C2.3 73.7 23 94.4 48.3 94.4 C73.7 94.4 94.4 73.7 94.4 48.3 C94.4 22.9 73.7 2.3 48.3 2.3 M48.3 96.7 C21.7 96.7 0 75 0 48.3 C0 21.7 21.7 0 48.3 0 C75 0 96.7 21.7 96.7 48.3 C96.7 75 75 96.7 48.3 96.7 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 30.4 30.4)" d="M43.2 2.5 C20.8 2.5 2.5 20.8 2.5 43.2 C2.5 65.7 20.8 83.9 43.2 83.9 C65.7 83.9 84 65.7 84 43.2 C84 20.8 65.7 2.5 43.2 2.5 M43.2 86.5 C19.4 86.5 0 67.1 0 43.2 C0 19.4 19.4 0 43.2 0 C67.1 0 86.5 19.4 86.5 43.2 C86.5 67.1 67.1 86.5 43.2 86.5 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 36.5 36.5)" d="M38.1 2.8 C18.6 2.8 2.8 18.7 2.8 38.2 C2.8 57.7 18.6 73.5 38.1 73.5 C57.7 73.5 73.5 57.7 73.5 38.2 C73.5 18.7 57.7 2.8 38.1 2.8 M38.1 76.3 C17.1 76.3 0 59.2 0 38.2 C0 17.1 17.1 0 38.1 0 C59.2 0 76.3 17.1 76.3 38.2 C76.3 59.2 59.2 76.3 38.1 76.3 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 42.5 42.5)" d="M33.1 3 C16.5 3 3 16.5 3 33.1 C3 49.7 16.5 63.1 33.1 63.1 C49.7 63.1 63.2 49.7 63.2 33.1 C63.2 16.5 49.7 3 33.1 3 M33.1 66.1 C14.9 66.1 0 51.3 0 33.1 C0 14.9 14.9 0 33.1 0 C51.3 0 66.2 14.9 66.2 33.1 C66.2 51.3 51.3 66.1 33.1 66.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 48.6 48.6)" d="M28 3.3 C14.4 3.3 3.3 14.4 3.3 28 C3.3 41.6 14.4 52.7 28 52.7 C41.6 52.7 52.7 41.6 52.7 28 C52.7 14.4 41.6 3.3 28 3.3 M28 56 C12.5 56 0 43.4 0 28 C0 12.5 12.5 0 28 0 C43.4 0 56 12.5 56 28 C56 43.4 43.4 56 28 56 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 54.7 54.7)" d="M22.9 3.5 C12.2 3.5 3.5 12.2 3.5 22.9 C3.5 33.6 12.2 42.3 22.9 42.3 C33.6 42.3 42.3 33.6 42.3 22.9 C42.3 12.2 33.6 3.5 22.9 3.5 M22.9 45.8 C10.2 45.8 0 35.5 0 22.9 C0 10.3 10.2 0 22.9 0 C35.5 0 45.8 10.3 45.8 22.9 C45.8 35.5 35.5 45.8 22.9 45.8 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 60.8 60.8)" d="M17.8 3.7 C10.1 3.7 3.8 10.1 3.8 17.8 C3.8 25.5 10.1 31.9 17.8 31.9 C25.6 31.9 31.9 25.5 31.9 17.8 C31.9 10.1 25.6 3.7 17.8 3.7 M17.8 35.6 C8 35.6 0 27.6 0 17.8 C0 8 8 0 17.8 0 C27.6 0 35.6 8 35.6 17.8 C35.6 27.6 27.6 35.6 17.8 35.6 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 66.9 66.9)" d="M12.7 4 C7.9 4 4 7.9 4 12.7 C4 17.5 7.9 21.5 12.7 21.5 C17.5 21.5 21.4 17.5 21.4 12.7 C21.4 7.9 17.5 4 12.7 4 M12.7 25.5 C5.7 25.5 0 19.8 0 12.7 C0 5.7 5.7 0 12.7 0 C19.7 0 25.4 5.7 25.4 12.7 C25.4 19.8 19.7 25.5 12.7 25.5 Z"/></symbol>
+<symbol id="m1d" viewBox="0 0 257.4 89.1"><path class="f-cyan" transform="translate(82.2 1.5)" d="M0 0 L0 0 L87.6 0 L87.6 87.6 L87.6 87.6 C39.2 87.6 0 48.4 0 0 Z"/><path class="f-blue" transform="translate(169.8 1.5)" d="M87.6 0 L0 0 L0 87.6 L0 87.6 C48.4 87.6 87.6 48.4 87.6 0 Z"/><path class="f-blue" transform="matrix(0.6544 0 0 0.6544 0 0)" d="M0 68 C0 30.5 30.5 0 68.1 0 C105.6 0 136.1 30.5 136.1 68 C136.1 105.6 105.6 136.1 68.1 136.1 C30.5 136.1 0 105.6 0 68 Z"/><path class="f-white" transform="matrix(0.6544 0 0 0.6544 25.6 25.6)" d="M0 28.9 C0 12.9 12.9 0 28.9 0 C44.8 0 57.7 12.9 57.7 28.9 C57.7 44.8 44.8 57.8 28.9 57.8 C12.9 57.8 0 44.8 0 28.9 Z"/></symbol>
+<symbol id="m12c" viewBox="0 0 222.6 89.1"><path class="f-cyan" transform="translate(0 0)" d="M44.5 89 L44.5 89 C19.9 89 0 69.1 0 44.5 L0 44.5 C0 19.9 19.9 0 44.5 0 L44.5 0 C69.1 0 89 19.9 89 44.5 L89 44.5 C89 69.1 69.1 89 44.5 89 Z"/><path class="f-navy" transform="translate(24.6 24.6)" d="M19.9 39.9 L19.9 39.9 C8.9 39.9 0 31 0 19.9 C0 8.9 8.9 0 19.9 0 L19.9 0 C31 0 39.9 8.9 39.9 19.9 C39.9 31 31 39.9 19.9 39.9 Z"/><path class="f-blue" transform="translate(178.1 0)" d="M44.5 89 L0 89 L0 22.3 C0 10 10 0 22.3 0 C34.6 0 44.5 10 44.5 22.3 L44.5 89 Z"/><path class="f-white" transform="translate(89 0)" d="M0 89 L0 0 L89 0 L0 89 Z"/><path class="f-cyan" transform="translate(89 0)" d="M89 0 L89 89 L0 89 L89 0 Z"/></symbol>
+<symbol id="m12d" viewBox="0 0 87.6 87.6"><path class="f-cyan" transform="matrix(1 0 0 -1 0 87.6)" d="M0 0 L0 0 L87.6 0 L87.6 87.6 L87.6 87.6 C39.2 87.6 0 48.4 0 0 Z"/></symbol>
+<symbol id="m8c" viewBox="0 0 356.2 89.0"><path class="f-navy" transform="translate(0 0)" d="M0 89 L0 0 L267.1 0 L267.1 89 L0 89 Z"/><path class="f-white" transform="translate(0 26)" d="M0 0 L0 16.4 L46.7 63 L63 63 L0 0 Z"/><path class="f-white" transform="translate(1 0)" d="M16.3 0 L0 0 L89 89 L105.4 89 L16.3 0 Z"/><path class="f-white" transform="translate(44.3 0)" d="M16.3 0 L0 0 L89 89 L105.4 89 L16.3 0 Z"/><path class="f-white" transform="translate(0 69.3)" d="M0 16.3 L3.4 19.7 L19.7 19.7 L0 0 L0 16.3 Z"/><path class="f-white" transform="translate(217.5 0)" d="M16.4 0 L0 0 L49.6 49.6 L49.6 33.3 L16.4 0 Z"/><path class="f-white" transform="translate(174.2 0)" d="M92.9 76.6 L16.4 0 L0 0 L89 89 L92.9 89 L92.9 76.6 Z"/><path class="f-white" transform="translate(87.6 0)" d="M16.4 0 L0 0 L89 89 L105.4 89 L16.4 0 Z"/><path class="f-white" transform="translate(130.9 0)" d="M16.4 0 L0 0 L89 89 L105.4 89 L16.4 0 Z"/><path class="f-cyan" transform="translate(14.2 14.2)" d="M60.6 30.3 C60.6 47 47.1 60.6 30.3 60.6 C13.6 60.6 0 47 0 30.3 C0 13.6 13.6 0 30.3 0 C47.1 0 60.6 13.6 60.6 30.3 Z"/><path class="f-blue" transform="translate(267.1 0)" d="M89 89 L0 89 L0 0 L89 0 L89 89 Z"/><path class="f-cyan" transform="translate(267.1 0)" d="M0 89 L0 0 L89 0 L0 89 Z"/></symbol>
+<symbol id="m2a" viewBox="0 0 355.9 89.3"><path class="f-blue" transform="matrix(0 -1 -1 0 88.9 89.3)" d="M81.6 0 L89 0 L89 88.9 L0 88.9 L0 81.6 C0 36.5 36.5 0 81.6 0 Z"/><path class="f-cyan" transform="matrix(0 -1 -1 0 177.9 89.3)" d="M89 89 L0 89 L0 0 L89 89 Z"/><path class="f-cyan" transform="matrix(0 -1 -1 0 266.9 89)" d="M89 0 L0 0 L0 89 L89 89 L89 0 Z"/><path class="f-blue" transform="matrix(0 -1 -1 0 355.9 45.1)" d="M0 0 L44.5 0 L44.5 66.7 C44.5 79 34.5 89 22.3 89 C10 89 0 79 0 66.7 L0 0 Z"/><path class="f-white" transform="matrix(0 -1 -1 0 355.9 89)" d="M0 0 L44.5 0 L44.5 66.7 C44.5 79 34.5 89 22.2 89 C10 89 0 79 0 66.7 L0 0 Z"/></symbol>
+<symbol id="m2b" viewBox="0 0 355.8 89.0"><path class="f-white" transform="matrix(0 -1 1 0 266.9 89)" d="M0 89 L0 89 C49.2 89 89 49.1 89 0 L89 0 L0 0 L0 89 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 0 89)" d="M89 266.9 L0 266.9 L0 0 L89 0 L89 266.9 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 160.6 89)" d="M0 89 L0 105.3 L89 16.4 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 117.4 89)" d="M0 89 L0 105.3 L89 16.4 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(0 -0.6539 0.6539 0 203.9 63.1)" d="M0 96.3 L25 96.3 L96.4 25 L96.4 0 L0 96.3 Z"/><path class="f-navy" transform="matrix(0 -0.6539 0.6539 0 247.2 19.8)" d="M25 30.1 L30.1 25 L30.1 0 L0 30.1 L25 30.1 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 0 89)" d="M0 33.2 L0 49.6 L49.6 0 L33.2 0 L0 33.2 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 0 89)" d="M76.5 0 L0 76.5 L0 92.8 L89 3.9 L89 0 L76.5 0 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 74.1 89)" d="M0 89 L0 105.3 L89 16.3 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 30.8 89)" d="M0 89 L0 105.3 L89 16.3 L89 0 L0 89 Z"/></symbol>
+<symbol id="m2c" viewBox="0 0 31.0 97.5"><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 12.5 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 0 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 0.7989 25 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m14b" viewBox="0 0 89.0 355.9"><path class="f-white" transform="matrix(1 0 0 -1 0 89)" d="M0 89 L0 89 C49.2 89 89 49.1 89 0 L89 0 L0 0 L0 89 Z"/><path class="f-cyan" transform="matrix(1 0 0 -1 0 355.8)" d="M89 266.9 L0 266.9 L0 0 L89 0 L89 266.9 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 195.2)" d="M0 89 L0 105.3 L89 16.4 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 238.5)" d="M0 89 L0 105.3 L89 16.4 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(0.6539 0 0 -0.6539 25.9 151.9)" d="M0 96.3 L25 96.3 L96.4 25 L96.4 0 L0 96.3 Z"/><path class="f-navy" transform="matrix(0.6539 0 0 -0.6539 69.2 108.6)" d="M25 30.1 L30.1 25 L30.1 0 L0 30.1 L25 30.1 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 355.8)" d="M0 33.2 L0 49.6 L49.6 0 L33.2 0 L0 33.2 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 355.8)" d="M76.5 0 L0 76.5 L0 92.8 L89 3.9 L89 0 L76.5 0 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 281.7)" d="M0 89 L0 105.3 L89 16.3 L89 0 L0 89 Z"/><path class="f-navy" transform="matrix(1 0 0 -1 0 325)" d="M0 89 L0 105.3 L89 16.3 L89 0 L0 89 Z"/></symbol>
+<symbol id="m24a" viewBox="0 0 178.6 89.3"><path class="f-white" transform="translate(0 0)" d="M0 0 L178.5 0 L178.5 89.3 L0 89.3 L0 0 Z"/><path class="f-blue" transform="translate(0 44.6)" d="M44.6 0 L178.6 0 L178.6 44.6 L0 44.6 L0 44.6 C0 20 20 0 44.6 0 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 0 89.3)" d="M44.6 89.3 L44.6 89.3 C20 89.3 0 69.3 0 44.6 L0 44.6 C0 20 20 0 44.6 0 L44.6 0 C69.3 0 89.3 20 89.3 44.6 L89.3 44.6 C89.3 69.3 69.3 89.3 44.6 89.3 Z"/><path class="f-navy" transform="matrix(0 -1 1 0 24.6 64.6)" d="M20 40 L20 40 C9 40 0 31 0 20 C0 9 9 0 20 0 L20 0 C31 0 40 9 40 20 C40 31 31 40 20 40 Z"/></symbol>
+<symbol id="m24b" viewBox="0 0 157.1 89.3"><path class="f-blue" transform="translate(0 0)" d="M0 0 L157.1 0 L157.1 89.3 L0 89.3 L0 0 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 77.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 84.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 91.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 98.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 105.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 112.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 119.2 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 126.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 133.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 140.2 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 147.2 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/><path class="f-cyan" transform="matrix(0 -1 1 0 154.3 89.3)" d="M89.2 2.9 L0 2.9 L0 0 L89.2 0 L89.2 2.9 Z"/></symbol>
+<symbol id="m6b" viewBox="0 0 30.9 97.5"><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m6c" viewBox="0 0 222.6 89.1"><path class="f-cyan" transform="matrix(-1 0 0 1 222.6 0)" d="M44.5 89 L44.5 89 C19.9 89 0 69.1 0 44.5 L0 44.5 C0 19.9 19.9 0 44.5 0 L44.5 0 C69.1 0 89 19.9 89 44.5 L89 44.5 C89 69.1 69.1 89 44.5 89 Z"/><path class="f-navy" transform="matrix(-1 0 0 1 198 24.6)" d="M19.9 39.9 L19.9 39.9 C8.9 39.9 0 31 0 19.9 C0 8.9 8.9 0 19.9 0 L19.9 0 C31 0 39.9 8.9 39.9 19.9 C39.9 31 31 39.9 19.9 39.9 Z"/><path class="f-blue" transform="matrix(-1 0 0 1 44.5 0)" d="M44.5 89 L0 89 L0 22.3 C0 10 10 0 22.3 0 C34.6 0 44.5 10 44.5 22.3 L44.5 89 Z"/><path class="f-white" transform="matrix(-1 0 0 1 133.6 0)" d="M0 89 L0 0 L89 0 L0 89 Z"/><path class="f-cyan" transform="matrix(-1 0 0 1 133.5 0)" d="M89 0 L89 89 L0 89 L89 0 Z"/></symbol>
+<symbol id="m15a" viewBox="0 0 142.0 53.5"><path class="f-cyan" transform="matrix(0 -0.6011 -1 0 89 53.5)" d="M89 0 L0 0 L0 89 L89 89 L89 0 Z"/><path class="f-blue" transform="matrix(0 -0.6011 -1 0 142 27.1)" d="M0 0 L44.5 0 L44.5 39.8 C44.5 47.1 34.5 53.1 22.3 53.1 C10 53.1 0 47.1 0 39.8 L0 0 Z"/><path class="f-white" transform="matrix(0 -0.6011 -1 0 142 53.5)" d="M0 0 L44.5 0 L44.5 39.8 C44.5 47.1 34.5 53.1 22.2 53.1 C10 53.1 0 47.1 0 39.8 L0 0 Z"/></symbol>
+<symbol id="m15c" viewBox="0 0 164.2 164.1"><path class="f-cyan" transform="matrix(1.195 0 0 1.195 0 0)" d="M68.7 1.3 C31.6 1.3 1.3 31.5 1.3 68.7 C1.3 105.8 31.6 136.1 68.7 136.1 C105.8 136.1 136.1 105.8 136.1 68.7 C136.1 31.5 105.8 1.3 68.7 1.3 M68.7 137.4 C30.8 137.4 0 106.5 0 68.7 C0 30.8 30.8 0 68.7 0 C106.6 0 137.4 30.8 137.4 68.7 C137.4 106.5 106.6 137.4 68.7 137.4 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 6.1 6.1)" d="M63.6 1.6 C29.4 1.6 1.6 29.4 1.6 63.6 C1.6 97.8 29.4 125.6 63.6 125.6 C97.9 125.6 125.7 97.8 125.7 63.6 C125.7 29.4 97.9 1.6 63.6 1.6 M63.6 127.2 C28.5 127.2 0 98.7 0 63.6 C0 28.5 28.5 0 63.6 0 C98.7 0 127.2 28.5 127.2 63.6 C127.2 98.7 98.7 127.2 63.6 127.2 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 12.2 12.2)" d="M58.5 1.8 C27.3 1.8 1.8 27.3 1.8 58.5 C1.8 89.8 27.3 115.2 58.5 115.2 C89.8 115.2 115.2 89.8 115.2 58.5 C115.2 27.3 89.8 1.8 58.5 1.8 M58.5 117.1 C26.3 117.1 0 90.8 0 58.5 C0 26.2 26.3 0 58.5 0 C90.8 0 117.1 26.2 117.1 58.5 C117.1 90.8 90.8 117.1 58.5 117.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 18.2 18.2)" d="M53.4 2.1 C25.1 2.1 2 25.1 2 53.4 C2 81.8 25.1 104.8 53.4 104.8 C81.8 104.8 104.8 81.8 104.8 53.4 C104.8 25.1 81.8 2.1 53.4 2.1 M53.4 106.9 C24 106.9 0 82.9 0 53.4 C0 24 24 0 53.4 0 C82.9 0 106.8 24 106.8 53.4 C106.8 82.9 82.9 106.9 53.4 106.9 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 24.3 24.3)" d="M48.3 2.3 C23 2.3 2.3 22.9 2.3 48.3 C2.3 73.7 23 94.4 48.3 94.4 C73.7 94.4 94.4 73.7 94.4 48.3 C94.4 22.9 73.7 2.3 48.3 2.3 M48.3 96.7 C21.7 96.7 0 75 0 48.3 C0 21.7 21.7 0 48.3 0 C75 0 96.7 21.7 96.7 48.3 C96.7 75 75 96.7 48.3 96.7 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 30.4 30.4)" d="M43.2 2.5 C20.8 2.5 2.5 20.8 2.5 43.2 C2.5 65.7 20.8 83.9 43.2 83.9 C65.7 83.9 84 65.7 84 43.2 C84 20.8 65.7 2.5 43.2 2.5 M43.2 86.5 C19.4 86.5 0 67.1 0 43.2 C0 19.4 19.4 0 43.2 0 C67.1 0 86.5 19.4 86.5 43.2 C86.5 67.1 67.1 86.5 43.2 86.5 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 36.5 36.5)" d="M38.1 2.8 C18.6 2.8 2.8 18.7 2.8 38.2 C2.8 57.7 18.6 73.5 38.1 73.5 C57.7 73.5 73.5 57.7 73.5 38.2 C73.5 18.7 57.7 2.8 38.1 2.8 M38.1 76.3 C17.1 76.3 0 59.2 0 38.2 C0 17.1 17.1 0 38.1 0 C59.2 0 76.3 17.1 76.3 38.2 C76.3 59.2 59.2 76.3 38.1 76.3 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 42.5 42.5)" d="M33.1 3 C16.5 3 3 16.5 3 33.1 C3 49.7 16.5 63.1 33.1 63.1 C49.7 63.1 63.2 49.7 63.2 33.1 C63.2 16.5 49.7 3 33.1 3 M33.1 66.1 C14.9 66.1 0 51.3 0 33.1 C0 14.9 14.9 0 33.1 0 C51.3 0 66.2 14.9 66.2 33.1 C66.2 51.3 51.3 66.1 33.1 66.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 48.6 48.6)" d="M28 3.3 C14.4 3.3 3.3 14.4 3.3 28 C3.3 41.6 14.4 52.7 28 52.7 C41.6 52.7 52.7 41.6 52.7 28 C52.7 14.4 41.6 3.3 28 3.3 M28 56 C12.5 56 0 43.4 0 28 C0 12.5 12.5 0 28 0 C43.4 0 56 12.5 56 28 C56 43.4 43.4 56 28 56 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 54.7 54.7)" d="M22.9 3.5 C12.2 3.5 3.5 12.2 3.5 22.9 C3.5 33.6 12.2 42.3 22.9 42.3 C33.6 42.3 42.3 33.6 42.3 22.9 C42.3 12.2 33.6 3.5 22.9 3.5 M22.9 45.8 C10.2 45.8 0 35.5 0 22.9 C0 10.3 10.2 0 22.9 0 C35.5 0 45.8 10.3 45.8 22.9 C45.8 35.5 35.5 45.8 22.9 45.8 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 60.8 60.8)" d="M17.8 3.7 C10.1 3.7 3.8 10.1 3.8 17.8 C3.8 25.5 10.1 31.9 17.8 31.9 C25.6 31.9 31.9 25.5 31.9 17.8 C31.9 10.1 25.6 3.7 17.8 3.7 M17.8 35.6 C8 35.6 0 27.6 0 17.8 C0 8 8 0 17.8 0 C27.6 0 35.6 8 35.6 17.8 C35.6 27.6 27.6 35.6 17.8 35.6 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 1.195 66.9 66.9)" d="M12.7 4 C7.9 4 4 7.9 4 12.7 C4 17.5 7.9 21.5 12.7 21.5 C17.5 21.5 21.4 17.5 21.4 12.7 C21.4 7.9 17.5 4 12.7 4 M12.7 25.5 C5.7 25.5 0 19.8 0 12.7 C0 5.7 5.7 0 12.7 0 C19.7 0 25.4 5.7 25.4 12.7 C25.4 19.8 19.7 25.5 12.7 25.5 Z"/></symbol>
+<symbol id="m25a" viewBox="0 0 164.2 164.2"><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 164.2 0)" d="M68.7 1.3 C31.6 1.3 1.3 31.5 1.3 68.7 C1.3 105.8 31.6 136.1 68.7 136.1 C105.8 136.1 136.1 105.8 136.1 68.7 C136.1 31.5 105.8 1.3 68.7 1.3 M68.7 137.4 C30.8 137.4 0 106.5 0 68.7 C0 30.8 30.8 0 68.7 0 C106.6 0 137.4 30.8 137.4 68.7 C137.4 106.5 106.6 137.4 68.7 137.4 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 158.1 6.1)" d="M63.6 1.6 C29.4 1.6 1.6 29.4 1.6 63.6 C1.6 97.8 29.4 125.6 63.6 125.6 C97.9 125.6 125.7 97.8 125.7 63.6 C125.7 29.4 97.9 1.6 63.6 1.6 M63.6 127.2 C28.5 127.2 0 98.7 0 63.6 C0 28.5 28.5 0 63.6 0 C98.7 0 127.2 28.5 127.2 63.6 C127.2 98.7 98.7 127.2 63.6 127.2 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 152 12.2)" d="M58.5 1.8 C27.3 1.8 1.8 27.3 1.8 58.5 C1.8 89.8 27.3 115.2 58.5 115.2 C89.8 115.2 115.2 89.8 115.2 58.5 C115.2 27.3 89.8 1.8 58.5 1.8 M58.5 117.1 C26.3 117.1 0 90.8 0 58.5 C0 26.2 26.3 0 58.5 0 C90.8 0 117.1 26.2 117.1 58.5 C117.1 90.8 90.8 117.1 58.5 117.1 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 145.9 18.2)" d="M53.4 2.1 C25.1 2.1 2 25.1 2 53.4 C2 81.8 25.1 104.8 53.4 104.8 C81.8 104.8 104.8 81.8 104.8 53.4 C104.8 25.1 81.8 2.1 53.4 2.1 M53.4 106.9 C24 106.9 0 82.9 0 53.4 C0 24 24 0 53.4 0 C82.9 0 106.8 24 106.8 53.4 C106.8 82.9 82.9 106.9 53.4 106.9 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 139.9 24.3)" d="M48.3 2.3 C23 2.3 2.3 22.9 2.3 48.3 C2.3 73.7 23 94.4 48.3 94.4 C73.7 94.4 94.4 73.7 94.4 48.3 C94.4 22.9 73.7 2.3 48.3 2.3 M48.3 96.7 C21.7 96.7 0 75 0 48.3 C0 21.7 21.7 0 48.3 0 C75 0 96.7 21.7 96.7 48.3 C96.7 75 75 96.7 48.3 96.7 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 133.8 30.4)" d="M43.2 2.5 C20.8 2.5 2.5 20.8 2.5 43.2 C2.5 65.7 20.8 83.9 43.2 83.9 C65.7 83.9 84 65.7 84 43.2 C84 20.8 65.7 2.5 43.2 2.5 M43.2 86.5 C19.4 86.5 0 67.1 0 43.2 C0 19.4 19.4 0 43.2 0 C67.1 0 86.5 19.4 86.5 43.2 C86.5 67.1 67.1 86.5 43.2 86.5 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 127.7 36.5)" d="M38.1 2.8 C18.6 2.8 2.8 18.7 2.8 38.2 C2.8 57.7 18.6 73.5 38.1 73.5 C57.7 73.5 73.5 57.7 73.5 38.2 C73.5 18.7 57.7 2.8 38.1 2.8 M38.1 76.3 C17.1 76.3 0 59.2 0 38.2 C0 17.1 17.1 0 38.1 0 C59.2 0 76.3 17.1 76.3 38.2 C76.3 59.2 59.2 76.3 38.1 76.3 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 121.6 42.5)" d="M33.1 3 C16.5 3 3 16.5 3 33.1 C3 49.7 16.5 63.1 33.1 63.1 C49.7 63.1 63.2 49.7 63.2 33.1 C63.2 16.5 49.7 3 33.1 3 M33.1 66.1 C14.9 66.1 0 51.3 0 33.1 C0 14.9 14.9 0 33.1 0 C51.3 0 66.2 14.9 66.2 33.1 C66.2 51.3 51.3 66.1 33.1 66.1 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 115.5 48.6)" d="M28 3.3 C14.4 3.3 3.3 14.4 3.3 28 C3.3 41.6 14.4 52.7 28 52.7 C41.6 52.7 52.7 41.6 52.7 28 C52.7 14.4 41.6 3.3 28 3.3 M28 56 C12.5 56 0 43.4 0 28 C0 12.5 12.5 0 28 0 C43.4 0 56 12.5 56 28 C56 43.4 43.4 56 28 56 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 109.4 54.7)" d="M22.9 3.5 C12.2 3.5 3.5 12.2 3.5 22.9 C3.5 33.6 12.2 42.3 22.9 42.3 C33.6 42.3 42.3 33.6 42.3 22.9 C42.3 12.2 33.6 3.5 22.9 3.5 M22.9 45.8 C10.2 45.8 0 35.5 0 22.9 C0 10.3 10.2 0 22.9 0 C35.5 0 45.8 10.3 45.8 22.9 C45.8 35.5 35.5 45.8 22.9 45.8 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 103.4 60.8)" d="M17.8 3.7 C10.1 3.7 3.8 10.1 3.8 17.8 C3.8 25.5 10.1 31.9 17.8 31.9 C25.6 31.9 31.9 25.5 31.9 17.8 C31.9 10.1 25.6 3.7 17.8 3.7 M17.8 35.6 C8 35.6 0 27.6 0 17.8 C0 8 8 0 17.8 0 C27.6 0 35.6 8 35.6 17.8 C35.6 27.6 27.6 35.6 17.8 35.6 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 1.195 97.3 66.9)" d="M12.7 4 C7.9 4 4 7.9 4 12.7 C4 17.5 7.9 21.5 12.7 21.5 C17.5 21.5 21.4 17.5 21.4 12.7 C21.4 7.9 17.5 4 12.7 4 M12.7 25.5 C5.7 25.5 0 19.8 0 12.7 C0 5.7 5.7 0 12.7 0 C19.7 0 25.4 5.7 25.4 12.7 C25.4 19.8 19.7 25.5 12.7 25.5 Z"/></symbol>
+<symbol id="m25c" viewBox="0 0 222.5 89.1"><path class="f-cyan" transform="matrix(-1 0 0 1 222.6 0)" d="M44.5 89 L44.5 89 C19.9 89 0 69.1 0 44.5 L0 44.5 C0 19.9 19.9 0 44.5 0 L44.5 0 C69.1 0 89 19.9 89 44.5 L89 44.5 C89 69.1 69.1 89 44.5 89 Z"/><path class="f-navy" transform="matrix(-1 0 0 1 198 24.6)" d="M19.9 39.9 L19.9 39.9 C8.9 39.9 0 31 0 19.9 C0 8.9 8.9 0 19.9 0 L19.9 0 C31 0 39.9 8.9 39.9 19.9 C39.9 31 31 39.9 19.9 39.9 Z"/><path class="f-blue" transform="matrix(-1 0 0 1 44.5 0)" d="M44.5 89 L0 89 L0 22.3 C0 10 10 0 22.3 0 C34.6 0 44.5 10 44.5 22.3 L44.5 89 Z"/><path class="f-white" transform="matrix(-1 0 0 1 133.6 0)" d="M0 89 L0 0 L89 0 L0 89 Z"/><path class="f-cyan" transform="matrix(-1 0 0 1 133.5 0)" d="M89 0 L89 89 L0 89 L89 0 Z"/></symbol>
+<symbol id="m25d" viewBox="0 0 87.6 87.6"><path class="f-cyan" transform="matrix(-1 0 0 -1 87.6 87.6)" d="M0 0 L0 0 L87.6 0 L87.6 87.6 L87.6 87.6 C39.2 87.6 0 48.4 0 0 Z"/></symbol>
+<symbol id="m26a" viewBox="0 0 237.7 79.2"><path class="f-blue" transform="matrix(0.8898 0 0 0.8898 158.5 0)" d="M0 89 L0 89 C49.2 89 89 49.2 89 0 L89 0 L0 0 L0 89 Z"/><path class="f-cyan" transform="matrix(0.8898 0 0 0.8898 0 0)" d="M0 89 L89 89 C138.2 89 178.1 49.2 178.1 0 L178.1 0 L0 0 L0 89 Z"/></symbol>
+<symbol id="m13a" viewBox="0 0 262.8 87.6"><path class="f-cyan" transform="matrix(-0.6438 0 0 0.6438 262.8 0)" d="M136.1 136.1 L0 136.1 L0 0 L136.1 0 L136.1 136.1 Z"/><path class="f-white" transform="matrix(-0.6438 0 0 0.6438 175.2 0)" d="M0 0 L272.1 0 L272.1 136.1 L0 136.1 L0 0 Z"/><path class="f-blue" transform="matrix(-0.6438 0 0 0.6438 175.2 43.8)" d="M68 0 L272.2 0 L272.2 68 L0 68 L0 68 C0 30.5 30.5 0 68 0 Z"/><path class="f-cyan" transform="matrix(-0.6438 0 0 0.6438 87.6 0)" d="M0 68 C0 30.5 30.5 0 68.1 0 C105.6 0 136.1 30.5 136.1 68 C136.1 105.6 105.6 136.1 68.1 136.1 C30.5 136.1 0 105.6 0 68 Z"/><path class="f-navy" transform="matrix(-0.6438 0 0 0.6438 62.4 25.2)" d="M0 28.9 C0 12.9 12.9 0 28.9 0 C44.8 0 57.7 12.9 57.7 28.9 C57.7 44.8 44.8 57.8 28.9 57.8 C12.9 57.8 0 44.8 0 28.9 Z"/></symbol>
+<symbol id="m13d" viewBox="0 0 257.4 89.1"><path class="f-cyan" transform="matrix(-1 0 0 1 175.2 1.5)" d="M0 0 L0 0 L87.6 0 L87.6 87.6 L87.6 87.6 C39.2 87.6 0 48.4 0 0 Z"/><path class="f-blue" transform="matrix(-1 0 0 1 87.6 1.5)" d="M87.6 0 L0 0 L0 87.6 L0 87.6 C48.4 87.6 87.6 48.4 87.6 0 Z"/><path class="f-blue" transform="matrix(-0.6544 0 0 0.6544 257.4 0)" d="M0 68 C0 30.5 30.5 0 68.1 0 C105.6 0 136.1 30.5 136.1 68 C136.1 105.6 105.6 136.1 68.1 136.1 C30.5 136.1 0 105.6 0 68 Z"/><path class="f-white" transform="matrix(-0.6544 0 0 0.6544 231.8 25.6)" d="M0 28.9 C0 12.9 12.9 0 28.9 0 C44.8 0 57.7 12.9 57.7 28.9 C57.7 44.8 44.8 57.8 28.9 57.8 C12.9 57.8 0 44.8 0 28.9 Z"/></symbol>
+<symbol id="ms16a" viewBox="0 0 88.9 89.0"><path class="f-blue" transform="matrix(0 -1 -1 0 88.9 89)" d="M81.6 0 L89 0 L89 88.9 L0 88.9 L0 81.6 C0 36.5 36.5 0 81.6 0 Z"/></symbol>
+<symbol id="m17a" viewBox="0 0 355.9 89.3"><path class="f-blue" transform="matrix(0 1 1 0 266.9 0)" d="M81.6 0 L89 0 L89 88.9 L0 88.9 L0 81.6 C0 36.5 36.5 0 81.6 0 Z"/><path class="f-cyan" transform="matrix(0 1 1 0 178 0)" d="M89 89 L0 89 L0 0 L89 89 Z"/><path class="f-cyan" transform="matrix(0 1 1 0 89 0.3)" d="M89 0 L0 0 L0 89 L89 89 L89 0 Z"/><path class="f-blue" transform="matrix(0 1 1 0 0 44.2)" d="M0 0 L44.5 0 L44.5 66.7 C44.5 79 34.5 89 22.3 89 C10 89 0 79 0 66.7 L0 0 Z"/><path class="f-white" transform="matrix(0 1 1 0 0 0.3)" d="M0 0 L44.5 0 L44.5 66.7 C44.5 79 34.5 89 22.2 89 C10 89 0 79 0 66.7 L0 0 Z"/></symbol>
+<symbol id="m17b" viewBox="0 0 30.9 97.5"><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 18.4 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 30.9 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 -0.7989 5.9 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m17c" viewBox="0 0 164.2 164.2"><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 164.2 164.2)" d="M68.7 1.3 C31.6 1.3 1.3 31.5 1.3 68.7 C1.3 105.8 31.6 136.1 68.7 136.1 C105.8 136.1 136.1 105.8 136.1 68.7 C136.1 31.5 105.8 1.3 68.7 1.3 M68.7 137.4 C30.8 137.4 0 106.5 0 68.7 C0 30.8 30.8 0 68.7 0 C106.6 0 137.4 30.8 137.4 68.7 C137.4 106.5 106.6 137.4 68.7 137.4 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 158.1 158.1)" d="M63.6 1.6 C29.4 1.6 1.6 29.4 1.6 63.6 C1.6 97.8 29.4 125.6 63.6 125.6 C97.9 125.6 125.7 97.8 125.7 63.6 C125.7 29.4 97.9 1.6 63.6 1.6 M63.6 127.2 C28.5 127.2 0 98.7 0 63.6 C0 28.5 28.5 0 63.6 0 C98.7 0 127.2 28.5 127.2 63.6 C127.2 98.7 98.7 127.2 63.6 127.2 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 152 152)" d="M58.5 1.8 C27.3 1.8 1.8 27.3 1.8 58.5 C1.8 89.8 27.3 115.2 58.5 115.2 C89.8 115.2 115.2 89.8 115.2 58.5 C115.2 27.3 89.8 1.8 58.5 1.8 M58.5 117.1 C26.3 117.1 0 90.8 0 58.5 C0 26.2 26.3 0 58.5 0 C90.8 0 117.1 26.2 117.1 58.5 C117.1 90.8 90.8 117.1 58.5 117.1 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 145.9 146)" d="M53.4 2.1 C25.1 2.1 2 25.1 2 53.4 C2 81.8 25.1 104.8 53.4 104.8 C81.8 104.8 104.8 81.8 104.8 53.4 C104.8 25.1 81.8 2.1 53.4 2.1 M53.4 106.9 C24 106.9 0 82.9 0 53.4 C0 24 24 0 53.4 0 C82.9 0 106.8 24 106.8 53.4 C106.8 82.9 82.9 106.9 53.4 106.9 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 139.9 139.9)" d="M48.3 2.3 C23 2.3 2.3 22.9 2.3 48.3 C2.3 73.7 23 94.4 48.3 94.4 C73.7 94.4 94.4 73.7 94.4 48.3 C94.4 22.9 73.7 2.3 48.3 2.3 M48.3 96.7 C21.7 96.7 0 75 0 48.3 C0 21.7 21.7 0 48.3 0 C75 0 96.7 21.7 96.7 48.3 C96.7 75 75 96.7 48.3 96.7 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 133.8 133.8)" d="M43.2 2.5 C20.8 2.5 2.5 20.8 2.5 43.2 C2.5 65.7 20.8 83.9 43.2 83.9 C65.7 83.9 84 65.7 84 43.2 C84 20.8 65.7 2.5 43.2 2.5 M43.2 86.5 C19.4 86.5 0 67.1 0 43.2 C0 19.4 19.4 0 43.2 0 C67.1 0 86.5 19.4 86.5 43.2 C86.5 67.1 67.1 86.5 43.2 86.5 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 127.7 127.7)" d="M38.1 2.8 C18.6 2.8 2.8 18.7 2.8 38.2 C2.8 57.7 18.6 73.5 38.1 73.5 C57.7 73.5 73.5 57.7 73.5 38.2 C73.5 18.7 57.7 2.8 38.1 2.8 M38.1 76.3 C17.1 76.3 0 59.2 0 38.2 C0 17.1 17.1 0 38.1 0 C59.2 0 76.3 17.1 76.3 38.2 C76.3 59.2 59.2 76.3 38.1 76.3 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 121.6 121.6)" d="M33.1 3 C16.5 3 3 16.5 3 33.1 C3 49.7 16.5 63.1 33.1 63.1 C49.7 63.1 63.2 49.7 63.2 33.1 C63.2 16.5 49.7 3 33.1 3 M33.1 66.1 C14.9 66.1 0 51.3 0 33.1 C0 14.9 14.9 0 33.1 0 C51.3 0 66.2 14.9 66.2 33.1 C66.2 51.3 51.3 66.1 33.1 66.1 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 115.5 115.5)" d="M28 3.3 C14.4 3.3 3.3 14.4 3.3 28 C3.3 41.6 14.4 52.7 28 52.7 C41.6 52.7 52.7 41.6 52.7 28 C52.7 14.4 41.6 3.3 28 3.3 M28 56 C12.5 56 0 43.4 0 28 C0 12.5 12.5 0 28 0 C43.4 0 56 12.5 56 28 C56 43.4 43.4 56 28 56 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 109.4 109.5)" d="M22.9 3.5 C12.2 3.5 3.5 12.2 3.5 22.9 C3.5 33.6 12.2 42.3 22.9 42.3 C33.6 42.3 42.3 33.6 42.3 22.9 C42.3 12.2 33.6 3.5 22.9 3.5 M22.9 45.8 C10.2 45.8 0 35.5 0 22.9 C0 10.3 10.2 0 22.9 0 C35.5 0 45.8 10.3 45.8 22.9 C45.8 35.5 35.5 45.8 22.9 45.8 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 103.4 103.4)" d="M17.8 3.7 C10.1 3.7 3.8 10.1 3.8 17.8 C3.8 25.5 10.1 31.9 17.8 31.9 C25.6 31.9 31.9 25.5 31.9 17.8 C31.9 10.1 25.6 3.7 17.8 3.7 M17.8 35.6 C8 35.6 0 27.6 0 17.8 C0 8 8 0 17.8 0 C27.6 0 35.6 8 35.6 17.8 C35.6 27.6 27.6 35.6 17.8 35.6 Z"/><path class="f-cyan" transform="matrix(-1.195 0 0 -1.195 97.3 97.3)" d="M12.7 4 C7.9 4 4 7.9 4 12.7 C4 17.5 7.9 21.5 12.7 21.5 C17.5 21.5 21.4 17.5 21.4 12.7 C21.4 7.9 17.5 4 12.7 4 M12.7 25.5 C5.7 25.5 0 19.8 0 12.7 C0 5.7 5.7 0 12.7 0 C19.7 0 25.4 5.7 25.4 12.7 C25.4 19.8 19.7 25.5 12.7 25.5 Z"/></symbol>
+<symbol id="m28a" viewBox="0 0 164.2 164.2"><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 0 164.2)" d="M68.7 1.3 C31.6 1.3 1.3 31.5 1.3 68.7 C1.3 105.8 31.6 136.1 68.7 136.1 C105.8 136.1 136.1 105.8 136.1 68.7 C136.1 31.5 105.8 1.3 68.7 1.3 M68.7 137.4 C30.8 137.4 0 106.5 0 68.7 C0 30.8 30.8 0 68.7 0 C106.6 0 137.4 30.8 137.4 68.7 C137.4 106.5 106.6 137.4 68.7 137.4 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 6.1 158.1)" d="M63.6 1.6 C29.4 1.6 1.6 29.4 1.6 63.6 C1.6 97.8 29.4 125.6 63.6 125.6 C97.9 125.6 125.7 97.8 125.7 63.6 C125.7 29.4 97.9 1.6 63.6 1.6 M63.6 127.2 C28.5 127.2 0 98.7 0 63.6 C0 28.5 28.5 0 63.6 0 C98.7 0 127.2 28.5 127.2 63.6 C127.2 98.7 98.7 127.2 63.6 127.2 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 12.2 152)" d="M58.5 1.8 C27.3 1.8 1.8 27.3 1.8 58.5 C1.8 89.8 27.3 115.2 58.5 115.2 C89.8 115.2 115.2 89.8 115.2 58.5 C115.2 27.3 89.8 1.8 58.5 1.8 M58.5 117.1 C26.3 117.1 0 90.8 0 58.5 C0 26.2 26.3 0 58.5 0 C90.8 0 117.1 26.2 117.1 58.5 C117.1 90.8 90.8 117.1 58.5 117.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 18.2 146)" d="M53.4 2.1 C25.1 2.1 2 25.1 2 53.4 C2 81.8 25.1 104.8 53.4 104.8 C81.8 104.8 104.8 81.8 104.8 53.4 C104.8 25.1 81.8 2.1 53.4 2.1 M53.4 106.9 C24 106.9 0 82.9 0 53.4 C0 24 24 0 53.4 0 C82.9 0 106.8 24 106.8 53.4 C106.8 82.9 82.9 106.9 53.4 106.9 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 24.3 139.9)" d="M48.3 2.3 C23 2.3 2.3 22.9 2.3 48.3 C2.3 73.7 23 94.4 48.3 94.4 C73.7 94.4 94.4 73.7 94.4 48.3 C94.4 22.9 73.7 2.3 48.3 2.3 M48.3 96.7 C21.7 96.7 0 75 0 48.3 C0 21.7 21.7 0 48.3 0 C75 0 96.7 21.7 96.7 48.3 C96.7 75 75 96.7 48.3 96.7 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 30.4 133.8)" d="M43.2 2.5 C20.8 2.5 2.5 20.8 2.5 43.2 C2.5 65.7 20.8 83.9 43.2 83.9 C65.7 83.9 84 65.7 84 43.2 C84 20.8 65.7 2.5 43.2 2.5 M43.2 86.5 C19.4 86.5 0 67.1 0 43.2 C0 19.4 19.4 0 43.2 0 C67.1 0 86.5 19.4 86.5 43.2 C86.5 67.1 67.1 86.5 43.2 86.5 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 36.5 127.7)" d="M38.1 2.8 C18.6 2.8 2.8 18.7 2.8 38.2 C2.8 57.7 18.6 73.5 38.1 73.5 C57.7 73.5 73.5 57.7 73.5 38.2 C73.5 18.7 57.7 2.8 38.1 2.8 M38.1 76.3 C17.1 76.3 0 59.2 0 38.2 C0 17.1 17.1 0 38.1 0 C59.2 0 76.3 17.1 76.3 38.2 C76.3 59.2 59.2 76.3 38.1 76.3 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 42.5 121.6)" d="M33.1 3 C16.5 3 3 16.5 3 33.1 C3 49.7 16.5 63.1 33.1 63.1 C49.7 63.1 63.2 49.7 63.2 33.1 C63.2 16.5 49.7 3 33.1 3 M33.1 66.1 C14.9 66.1 0 51.3 0 33.1 C0 14.9 14.9 0 33.1 0 C51.3 0 66.2 14.9 66.2 33.1 C66.2 51.3 51.3 66.1 33.1 66.1 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 48.6 115.5)" d="M28 3.3 C14.4 3.3 3.3 14.4 3.3 28 C3.3 41.6 14.4 52.7 28 52.7 C41.6 52.7 52.7 41.6 52.7 28 C52.7 14.4 41.6 3.3 28 3.3 M28 56 C12.5 56 0 43.4 0 28 C0 12.5 12.5 0 28 0 C43.4 0 56 12.5 56 28 C56 43.4 43.4 56 28 56 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 54.7 109.5)" d="M22.9 3.5 C12.2 3.5 3.5 12.2 3.5 22.9 C3.5 33.6 12.2 42.3 22.9 42.3 C33.6 42.3 42.3 33.6 42.3 22.9 C42.3 12.2 33.6 3.5 22.9 3.5 M22.9 45.8 C10.2 45.8 0 35.5 0 22.9 C0 10.3 10.2 0 22.9 0 C35.5 0 45.8 10.3 45.8 22.9 C45.8 35.5 35.5 45.8 22.9 45.8 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 60.8 103.4)" d="M17.8 3.7 C10.1 3.7 3.8 10.1 3.8 17.8 C3.8 25.5 10.1 31.9 17.8 31.9 C25.6 31.9 31.9 25.5 31.9 17.8 C31.9 10.1 25.6 3.7 17.8 3.7 M17.8 35.6 C8 35.6 0 27.6 0 17.8 C0 8 8 0 17.8 0 C27.6 0 35.6 8 35.6 17.8 C35.6 27.6 27.6 35.6 17.8 35.6 Z"/><path class="f-cyan" transform="matrix(1.195 0 0 -1.195 66.9 97.3)" d="M12.7 4 C7.9 4 4 7.9 4 12.7 C4 17.5 7.9 21.5 12.7 21.5 C17.5 21.5 21.4 17.5 21.4 12.7 C21.4 7.9 17.5 4 12.7 4 M12.7 25.5 C5.7 25.5 0 19.8 0 12.7 C0 5.7 5.7 0 12.7 0 C19.7 0 25.4 5.7 25.4 12.7 C25.4 19.8 19.7 25.5 12.7 25.5 Z"/></symbol>
+<symbol id="m28b" viewBox="0 0 31.0 97.5"><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 5.9)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 21.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 36.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 51.8)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 67)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 82.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 12.5 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 0 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0.7989 0 0 -0.7989 25 97.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m28c" viewBox="0 0 222.6 89.0"><path class="f-cyan" transform="matrix(-1 0 0 -1 222.6 89)" d="M44.5 89 L44.5 89 C19.9 89 0 69.1 0 44.5 L0 44.5 C0 19.9 19.9 0 44.5 0 L44.5 0 C69.1 0 89 19.9 89 44.5 L89 44.5 C89 69.1 69.1 89 44.5 89 Z"/><path class="f-navy" transform="matrix(-1 0 0 -1 198 64.5)" d="M19.9 39.9 L19.9 39.9 C8.9 39.9 0 31 0 19.9 C0 8.9 8.9 0 19.9 0 L19.9 0 C31 0 39.9 8.9 39.9 19.9 C39.9 31 31 39.9 19.9 39.9 Z"/><path class="f-blue" transform="matrix(-1 0 0 -1 44.5 89)" d="M44.5 89 L0 89 L0 22.3 C0 10 10 0 22.3 0 C34.6 0 44.5 10 44.5 22.3 L44.5 89 Z"/><path class="f-white" transform="matrix(-1 0 0 -1 133.6 89)" d="M0 89 L0 0 L89 0 L0 89 Z"/><path class="f-cyan" transform="matrix(-1 0 0 -1 133.5 89)" d="M89 0 L89 89 L0 89 L89 0 Z"/></symbol>
+<symbol id="m28d" viewBox="0 0 87.6 87.6"><path class="f-cyan" transform="matrix(-1 0 0 1 87.6 0)" d="M0 0 L0 0 L87.6 0 L87.6 87.6 L87.6 87.6 C39.2 87.6 0 48.4 0 0 Z"/></symbol>
+<symbol id="m5a" viewBox="0 0 237.7 79.2"><path class="f-blue" transform="matrix(-0.8898 0 0 0.8898 79.2 0)" d="M0 89 L0 89 C49.2 89 89 49.2 89 0 L89 0 L0 0 L0 89 Z"/><path class="f-cyan" transform="matrix(-0.8898 0 0 0.8898 237.7 0)" d="M0 89 L89 89 C138.2 89 178.1 49.2 178.1 0 L178.1 0 L0 0 L0 89 Z"/></symbol>
+<symbol id="m5b" viewBox="0 0 31.0 97.5"><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 91.6)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 76.3)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 61)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 45.7)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 30.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 15.2)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 18.4 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 30.9 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(-0.7989 0 0 0.7989 5.9 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m20a" viewBox="0 0 97.5 31.0"><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 5.9 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 5.9 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 5.9 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 21.2 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 21.2 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 21.2 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 36.5 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 36.5 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 36.5 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 51.8 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 51.8 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 51.8 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 67 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 67 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 67 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 82.3 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 82.3 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 82.3 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 97.5 12.5)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 97.5 0)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.8 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.8 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/><path class="f-white" transform="matrix(0 0.7989 -0.7989 0 97.5 25)" d="M0 3.7 C0 1.7 1.7 0 3.7 0 C5.7 0 7.4 1.7 7.4 3.7 C7.4 5.8 5.7 7.4 3.7 7.4 C1.7 7.4 0 5.8 0 3.7 Z"/></symbol>
+<symbol id="m16a" viewBox="0 0 160.2 53.4"><path class="f-white" transform="matrix(-0.5999 0 0 0.5999 53.4 0)" d="M0 89 L0 89 C49.2 89 89 49.2 89 0 L89 0 L0 0 L0 89 Z"/><path class="f-cyan" transform="matrix(-0.5999 0 0 0.5999 160.2 0)" d="M0 89 L89 89 C138.2 89 178.1 49.2 178.1 0 L178.1 0 L0 0 L0 89 Z"/></symbol>
+<symbol id="m29d" viewBox="0 0 87.6 262.8"><path class="f-cyan" transform="matrix(0 0.6438 0.6438 0 0 0)" d="M136.1 136.1 L0 136.1 L0 0 L136.1 0 L136.1 136.1 Z"/><path class="f-white" transform="matrix(0 0.6438 0.6438 0 0 87.6)" d="M0 0 L272.1 0 L272.1 136.1 L0 136.1 L0 0 Z"/><path class="f-blue" transform="matrix(0 0.6438 0.6438 0 43.8 87.6)" d="M68 0 L272.2 0 L272.2 68 L0 68 L0 68 C0 30.5 30.5 0 68 0 Z"/><path class="f-cyan" transform="matrix(0 0.6438 0.6438 0 0 175.2)" d="M0 68 C0 30.5 30.5 0 68.1 0 C105.6 0 136.1 30.5 136.1 68 C136.1 105.6 105.6 136.1 68.1 136.1 C30.5 136.1 0 105.6 0 68 Z"/><path class="f-navy" transform="matrix(0 0.6438 0.6438 0 25.2 200.4)" d="M0 28.9 C0 12.9 12.9 0 28.9 0 C44.8 0 57.7 12.9 57.7 28.9 C57.7 44.8 44.8 57.8 28.9 57.8 C12.9 57.8 0 44.8 0 28.9 Z"/></symbol>
+</defs></svg>
+<main class="deck">
+<!-- ================= SLIDES START ================= -->
+<!-- layout: cover -->
+<section class="slide l-cover">
+  <svg class="deco" style="left:697.2px;top:-0px;width:262.8px;height:87.6px"><use href="#m1a"/></svg>
+  <svg class="deco" style="left:913.3px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:-79.9px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:0px;top:450.9px;width:257.4px;height:89.1px"><use href="#m1d"/></svg>
+  <div class="cv">
+    <h1 class="cv-title">[Tên đề tài, tối đa hai dòng]</h1>
+    <p class="cv-sub">[Phụ đề một dòng cho đề tài]</p>
+    <p class="cv-meta"><b>[Nhóm]</b> · GVHD: [Học vị. Họ tên]<br>[Khoa] · [Trường] · [Tháng/Năm]</p>
+  </div>
+</section>
+
+<!-- layout: toc -->
+<section class="slide l-toc">
+  <svg class="deco" style="left:-79.5px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:913.3px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:0px;top:450.9px;width:222.6px;height:89.1px"><use href="#m12c"/></svg>
+  <svg class="deco" style="left:872.4px;top:-0px;width:87.6px;height:87.6px"><use href="#m12d"/></svg>
+  <svg class="deco" style="left:13.1px;top:99.6px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <h2 class="title">Nội dung</h2>
+  <div class="toc">
+    <div class="it"><div class="num">01</div><div class="h3">Vấn đề</div><p>[Mô tả ngắn cho chương 1]</p></div>
+    <div class="it"><div class="num">02</div><div class="h3">Giải pháp</div><p>[Mô tả ngắn cho chương 2]</p></div>
+    <div class="it"><div class="num">03</div><div class="h3">Hệ thống</div><p>[Mô tả ngắn cho chương 3]</p></div>
+    <div class="it"><div class="num">04</div><div class="h3">Kết quả</div><p>[Mô tả ngắn cho chương 4]</p></div>
+    <div class="it"><div class="num">05</div><div class="h3">Hướng đi</div><p>[Mô tả ngắn cho chương 5]</p></div>
+  </div>
+</section>
+
+<!-- layout: whoa -->
+<section class="slide l-whoa">
+  <svg class="deco" style="left:876.1px;top:335.9px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:22.7px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:301.9px;top:0px;width:356.2px;height:89.0px"><use href="#m8c"/></svg>
+  <div class="big">Tại sao?</div>
+  <p class="sub">[Một câu dẫn vào vấn đề, tối đa 20 từ.]</p>
+</section>
+
+<!-- layout: section -->
+<section class="slide l-section">
+  <svg class="deco" style="left:0px;top:450.7px;width:355.9px;height:89.3px"><use href="#m2a"/></svg>
+  <svg class="deco" style="left:604.2px;top:-0px;width:355.8px;height:89.0px"><use href="#m2b"/></svg>
+  <svg class="deco" style="left:903.4px;top:416.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:-82.6px;top:56.6px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <div class="sec-num">01</div>
+  <div class="sec-title">Vấn đề</div>
+  <p class="sec-sub">[Câu hỏi hoặc bối cảnh mở đầu chương]</p>
+</section>
+
+<!-- layout: section-alt -->
+<section class="slide l-section alt">
+  <svg class="deco" style="left:604.1px;top:0px;width:355.9px;height:89.3px"><use href="#m2a"/></svg>
+  <svg class="deco" style="left:-0px;top:201.1px;width:89.0px;height:355.9px"><use href="#m14b"/></svg>
+  <svg class="deco" style="left:10.9px;top:12.8px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:877.1px;top:366.7px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <div class="sec-num">02</div>
+  <div class="sec-title">Giải pháp</div>
+  <p class="sec-sub">[Câu hỏi hoặc bối cảnh mở đầu chương]</p>
+</section>
+
+<!-- layout: text2 -->
+<section class="slide l-text2">
+  <svg class="deco" style="left:0px;top:450.7px;width:178.6px;height:89.3px"><use href="#m24a"/></svg>
+  <svg class="deco" style="left:802.9px;top:450.7px;width:157.1px;height:89.3px"><use href="#m24b"/></svg>
+  <svg class="deco" style="left:16.7px;top:19.3px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:904.1px;top:156.9px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">Bối cảnh</h2>
+  <div class="paras">
+    <p>[Đoạn 1: bối cảnh chung của đề tài, tối đa 35 từ. Nêu điều đang xảy ra và ai bị ảnh hưởng.]</p>
+    <p>[Đoạn 2: vì sao vấn đề đáng giải quyết ngay bây giờ, tối đa 35 từ.]</p>
+  </div>
+</section>
+
+<!-- layout: bullets -->
+<section class="slide l-bullets">
+  <svg class="deco" style="left:-79.5px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:15.8px;top:423.9px;width:30.9px;height:97.5px"><use href="#m6b"/></svg>
+  <svg class="deco" style="left:737.4px;top:450.9px;width:222.6px;height:89.1px"><use href="#m6c"/></svg>
+  <h2 class="title">Mục tiêu đề tài</h2>
+  <div class="body">
+    <p>[Câu mở đầu giới thiệu danh sách:]</p>
+    <ul class="ul">
+      <li>[Mục tiêu 1, tối đa 10 từ]</li>
+      <li>[Mục tiêu 2, tối đa 10 từ]</li>
+      <li>[Mục tiêu 3, tối đa 10 từ]</li>
+      <li>[Mục tiêu 4, tối đa 10 từ]</li>
+    </ul>
+  </div>
+</section>
+
+<!-- layout: steps -->
+<section class="slide l-steps">
+  <svg class="deco" style="left:0px;top:488px;width:142.0px;height:53.5px"><use href="#m15a"/></svg>
+  <svg class="deco" style="left:10.9px;top:12.8px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:901.3px;top:208.3px;width:164.2px;height:164.1px"><use href="#m15c"/></svg>
+  <h2 class="title">Quy trình thực hiện</h2>
+  <div class="cols" style="--n:4">
+    <div class="it"><div class="num">01</div><div class="h3">[Bước 1]</div><p>[Mô tả ngắn cho bước 1, tối đa 18 từ.]</p></div>
+    <div class="it"><div class="num">02</div><div class="h3">[Bước 2]</div><p>[Mô tả ngắn cho bước 2, tối đa 18 từ.]</p></div>
+    <div class="it"><div class="num">03</div><div class="h3">[Bước 3]</div><p>[Mô tả ngắn cho bước 3, tối đa 18 từ.]</p></div>
+    <div class="it"><div class="num">04</div><div class="h3">[Bước 4]</div><p>[Mô tả ngắn cho bước 4, tối đa 18 từ.]</p></div>
+  </div>
+</section>
+
+<!-- layout: zig2 -->
+<section class="slide l-zig n2">
+  <svg class="deco" style="left:876.1px;top:197px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:22.7px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:301.9px;top:451px;width:356.2px;height:89.0px"><use href="#m8c"/></svg>
+  <h2 class="title">[Tiêu đề so sánh hai ý]</h2>
+  <div class="zz">
+    <div class="it"><div class="h3">[Ý 1]</div><p>[Mô tả ý 1, tối đa 25 từ.]</p></div>
+    <div class="it"><div class="h3">[Ý 2]</div><p>[Mô tả ý 2, tối đa 25 từ.]</p></div>
+  </div>
+</section>
+
+<!-- layout: zig3 -->
+<section class="slide l-zig n3">
+  <svg class="deco" style="left:874.9px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <svg class="deco" style="left:15.4px;top:423.9px;width:30.9px;height:97.5px"><use href="#m6b"/></svg>
+  <svg class="deco" style="left:737.1px;top:450.9px;width:222.5px;height:89.1px"><use href="#m25c"/></svg>
+  <svg class="deco" style="left:-0.4px;top:-0px;width:87.6px;height:87.6px"><use href="#m25d"/></svg>
+  <h2 class="title">Tính năng chính</h2>
+  <div class="zz">
+    <div class="it"><div class="h3">[Tính năng 1]</div><p>[Mô tả ngắn, tối đa 15 từ.]</p></div>
+    <div class="it"><div class="h3">[Tính năng 2]</div><p>[Mô tả ngắn, tối đa 15 từ.]</p></div>
+    <div class="it"><div class="h3">[Tính năng 3]</div><p>[Mô tả ngắn, tối đa 15 từ.]</p></div>
+  </div>
+</section>
+
+<!-- layout: zig4 -->
+<section class="slide l-zig n4">
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:878.4px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">Các bên liên quan</h2>
+  <div class="zz">
+    <div class="it"><div class="h3">[Đối tượng 1]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Đối tượng 2]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Đối tượng 3]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Đối tượng 4]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+  </div>
+</section>
+
+<!-- layout: five -->
+<section class="slide l-five">
+  <svg class="deco" style="left:802.9px;top:450.7px;width:157.1px;height:89.3px"><use href="#m24b"/></svg>
+  <svg class="deco" style="left:921.4px;top:7.9px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:-105.3px;top:353.9px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">Yêu cầu chức năng</h2>
+  <div class="grid">
+    <div class="it"><div class="h3">[Chức năng 1]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Chức năng 2]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Chức năng 3]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Chức năng 4]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Chức năng 5]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+  </div>
+</section>
+
+<!-- layout: statement -->
+<section class="slide l-statement">
+  <svg class="deco" style="left:697.2px;top:-0px;width:262.8px;height:87.6px"><use href="#m1a"/></svg>
+  <svg class="deco" style="left:913.3px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:-79.9px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:0px;top:450.9px;width:257.4px;height:89.1px"><use href="#m1d"/></svg>
+  <div class="big">[Thông điệp chính, ngắn gọn]</div>
+</section>
+
+<!-- layout: focus -->
+<section class="slide l-statement accent">
+  <svg class="deco" style="left:697.2px;top:-0px;width:262.8px;height:87.6px"><use href="#m1a"/></svg>
+  <svg class="deco" style="left:913.3px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:-79.9px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:0px;top:450.9px;width:257.4px;height:89.1px"><use href="#m1d"/></svg>
+  <div class="st">
+    <p class="eyebrow">[Nhãn ngắn]</p>
+    <div class="big">[Ý chính khán giả cần nhớ, tối đa 90 ký tự]</div>
+    <div class="rule"></div>
+    <p class="sub">[Câu hỏi hoặc câu dẫn sang phần tiếp theo]</p>
+  </div>
+</section>
+
+<!-- layout: quote -->
+<section class="slide l-quote">
+  <svg class="deco" style="left:0.1px;top:-0px;width:262.8px;height:87.6px"><use href="#m13a"/></svg>
+  <svg class="deco" style="left:15.9px;top:423.9px;width:30.9px;height:97.5px"><use href="#m6b"/></svg>
+  <svg class="deco" style="left:875.8px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <svg class="deco" style="left:702.7px;top:450.9px;width:257.4px;height:89.1px"><use href="#m13d"/></svg>
+  <div class="qw">
+    <blockquote class="qt">“[Trích dẫn ngắn, tối đa 25 từ.]”</blockquote>
+    <p class="by">—[Nguồn trích dẫn]</p>
+  </div>
+</section>
+
+<!-- layout: photo -->
+<section class="slide l-photo">
+  <svg class="deco" style="left:-0px;top:0.3px;width:88.9px;height:89.0px"><use href="#ms16a"/></svg>
+  <svg class="deco" style="left:915.8px;top:426.5px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:612.4px;top:-89.4px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <div class="bg"><div class="ph">[ẢNH: mô tả, dùng &lt;img class="photo"&gt;]</div></div>
+  <div class="cap">[Một câu chú thích cho bức ảnh]</div>
+</section>
+
+<!-- layout: phototext -->
+<section class="slide l-phototext">
+  <svg class="deco" style="left:-0.6px;top:451.6px;width:355.9px;height:89.3px"><use href="#m17a"/></svg>
+  <svg class="deco" style="left:917.5px;top:430.6px;width:30.9px;height:97.5px"><use href="#m17b"/></svg>
+  <svg class="deco" style="left:-81.9px;top:10px;width:164.2px;height:164.2px"><use href="#m17c"/></svg>
+  <div class="txt">
+    <div class="tt">[Tiêu đề khái niệm]</div>
+    <p>[Đoạn mô tả, tối đa 30 từ. Hình ảnh truyền tải nhiều thông tin, nên dùng ảnh thay vì đoạn văn dài.]</p>
+  </div>
+  <div class="pic"><div class="ph">[ẢNH vuông]</div></div>
+</section>
+
+<!-- layout: bignum -->
+<section class="slide l-bignum">
+  <svg class="deco" style="left:0.1px;top:-0px;width:262.8px;height:87.6px"><use href="#m13a"/></svg>
+  <svg class="deco" style="left:15.9px;top:423.9px;width:30.9px;height:97.5px"><use href="#m6b"/></svg>
+  <svg class="deco" style="left:875.8px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <svg class="deco" style="left:702.7px;top:450.9px;width:257.4px;height:89.1px"><use href="#m13d"/></svg>
+  <div class="num">[98.300.000]</div>
+  <p class="cap">[Mô tả ngắn cho số liệu, một dòng]</p>
+</section>
+
+<!-- layout: stats -->
+<section class="slide l-stats">
+  <svg class="deco" style="left:768.9px;top:464.6px;width:164.2px;height:164.2px"><use href="#m28a"/></svg>
+  <svg class="deco" style="left:20.4px;top:18.9px;width:31.0px;height:97.5px"><use href="#m28b"/></svg>
+  <svg class="deco" style="left:737.4px;top:0.4px;width:222.6px;height:89.0px"><use href="#m28c"/></svg>
+  <svg class="deco" style="left:0px;top:452.7px;width:87.6px;height:87.6px"><use href="#m28d"/></svg>
+  <div class="zz">
+    <div class="it"><div class="v">[1,2 giây]</div><p>[Mô tả chỉ số 1]</p></div>
+    <div class="it"><div class="v">[12.500]</div><p>[Mô tả chỉ số 2]</p></div>
+    <div class="it"><div class="v">[98%]</div><p>[Mô tả chỉ số 3]</p></div>
+  </div>
+</section>
+
+<!-- layout: donuts -->
+<section class="slide l-donuts">
+  <svg class="deco" style="left:-0.2px;top:461.5px;width:237.7px;height:79.2px"><use href="#m5a"/></svg>
+  <svg class="deco" style="left:910.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m5b"/></svg>
+  <svg class="deco" style="left:879.2px;top:461.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <h2 class="title">[Tiêu đề kết quả]</h2>
+  <div class="zz">
+    <div class="col">
+      <svg class="ring" viewBox="0 0 100 100"><circle class="s-grey" cx="50" cy="50" r="38" fill="none" stroke-width="20"/><circle class="s-blue" cx="50" cy="50" r="38" fill="none" stroke-width="20" pathLength="100" stroke-dasharray="15 100" transform="rotate(-90 50 50)"/></svg>
+      <div class="stat">[15%]</div><div class="h3">[Chỉ số 1]</div><p>[Giải thích ngắn]</p>
+    </div>
+    <div class="col">
+      <div class="stat">[70%]</div><div class="h3">[Chỉ số 2]</div><p>[Giải thích ngắn]</p>
+      <svg class="ring" viewBox="0 0 100 100"><circle class="s-grey" cx="50" cy="50" r="38" fill="none" stroke-width="20"/><circle class="s-blue" cx="50" cy="50" r="38" fill="none" stroke-width="20" pathLength="100" stroke-dasharray="70 100" transform="rotate(-90 50 50)"/></svg>
+    </div>
+    <div class="col">
+      <svg class="ring" viewBox="0 0 100 100"><circle class="s-grey" cx="50" cy="50" r="38" fill="none" stroke-width="20"/><circle class="s-blue" cx="50" cy="50" r="38" fill="none" stroke-width="20" pathLength="100" stroke-dasharray="55 100" transform="rotate(-90 50 50)"/></svg>
+      <div class="stat">[55%]</div><div class="h3">[Chỉ số 3]</div><p>[Giải thích ngắn]</p>
+    </div>
+  </div>
+</section>
+
+<!-- layout: pie -->
+<section class="slide l-pie">
+  <svg class="deco" style="left:0px;top:488px;width:142.0px;height:53.5px"><use href="#m15a"/></svg>
+  <svg class="deco" style="left:10.9px;top:12.8px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:901.3px;top:208.3px;width:164.2px;height:164.1px"><use href="#m15c"/></svg>
+  <h2 class="title">[Tiêu đề biểu đồ]</h2>
+  <svg class="chart" viewBox="0 0 320 300">
+    <g fill="none" stroke-width="62" transform="rotate(-90 160 150)">
+      <circle class="s-cyan" cx="160" cy="150" r="104" pathLength="100" stroke-dasharray="45 100"/>
+      <circle class="s-grey" cx="160" cy="150" r="104" pathLength="100" stroke-dasharray="20 100" stroke-dashoffset="-45"/>
+      <circle class="s-blue" cx="160" cy="150" r="104" pathLength="100" stroke-dasharray="35 100" stroke-dashoffset="-65"/>
+    </g>
+  </svg>
+  <div class="legend">
+    <div class="row"><span class="dot"></span><span class="stat">45%</span><div><div class="h4">[Nhóm 1]</div><p class="sm">[Mô tả ngắn]</p></div></div>
+    <div class="row"><span class="dot grey"></span><span class="stat">20%</span><div><div class="h4">[Nhóm 2]</div><p class="sm">[Mô tả ngắn]</p></div></div>
+    <div class="row"><span class="dot blue"></span><span class="stat">35%</span><div><div class="h4">[Nhóm 3]</div><p class="sm">[Mô tả ngắn]</p></div></div>
+  </div>
+  <p class="foot">[Nguồn số liệu: khảo sát N người, tháng/năm]</p>
+</section>
+
+<!-- layout: computer -->
+<section class="slide l-computer">
+  <svg class="deco" style="left:-79.5px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:913.3px;top:423.9px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:0px;top:450.9px;width:222.6px;height:89.1px"><use href="#m12c"/></svg>
+  <svg class="deco" style="left:872.4px;top:-0px;width:87.6px;height:87.6px"><use href="#m12d"/></svg>
+  <div class="mon"><div class="scr"><div class="ph">[SCREENSHOT web, dùng &lt;img class="shot"&gt;]</div></div><div class="neck"></div><div class="base"></div></div>
+  <div class="txt">
+    <div class="h3">[Tên màn hình]</div>
+    <p>[Mô tả luồng chính trên màn hình này, tối đa 30 từ.]</p>
+  </div>
+</section>
+
+<!-- layout: tablet -->
+<section class="slide l-tablet">
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:878.4px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">[Tên màn hình dashboard]</h2>
+  <p class="sub">[Một câu mô tả màn hình, tối đa 20 từ.]</p>
+  <div class="tab"><div class="ph" style="background:var(--white)">[SCREENSHOT ngang]</div></div>
+</section>
+
+<!-- layout: phone -->
+<section class="slide l-phone">
+  <svg class="deco" style="left:850.3px;top:502.1px;width:97.5px;height:31.0px"><use href="#m20a"/></svg>
+  <svg class="deco" style="left:-82.9px;top:458px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:-0px;top:0px;width:356.2px;height:89.0px"><use href="#m8c"/></svg>
+  <div class="txt">
+    <div class="tt">[Ứng dụng di động]</div>
+    <p>[Mô tả chức năng của màn hình, tối đa 30 từ.]</p>
+  </div>
+  <div class="ph-frame"><div class="ph" style="background:var(--white)">[SCREENSHOT dọc]</div></div>
+</section>
+
+<!-- layout: table -->
+<section class="slide l-table">
+  <svg class="deco" style="left:799.8px;top:487.3px;width:160.2px;height:53.4px"><use href="#m16a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:-83.8px;top:461.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">[Tiêu đề bảng]</h2>
+  <div class="tblwrap">
+    <table class="tbl">
+      <thead><tr><th>[Hạng mục]</th><th>[Mô tả]</th><th>[Tỉ lệ]</th><th>[Số lượng]</th></tr></thead>
+      <tbody>
+        <tr><td class="rh">[Mục 1]</td><td>[Mô tả ngắn]</td><td class="v">[45%]</td><td class="v">[4.500]</td></tr>
+        <tr><td class="rh">[Mục 2]</td><td>[Mô tả ngắn]</td><td class="v">[85%]</td><td class="v">[1.200]</td></tr>
+        <tr><td class="rh">[Mục 3]</td><td>[Mô tả ngắn]</td><td class="v">[15%]</td><td class="v">[9.400]</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- layout: compare -->
+<section class="slide l-table">
+  <svg class="deco" style="left:799.8px;top:487.3px;width:160.2px;height:53.4px"><use href="#m16a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:-83.8px;top:461.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">So sánh giải pháp hiện có</h2>
+  <div class="tblwrap">
+    <table class="tbl">
+      <thead><tr><th>Tiêu chí</th><th>[Giải pháp 1]</th><th>[Giải pháp 2]</th><th>[Giải pháp 3]</th><th>Của nhóm</th></tr></thead>
+      <tbody>
+        <tr><td class="rh">[Tiêu chí 1]</td><td><span class="dot grey"></span></td><td></td><td><span class="dot grey"></span></td><td><span class="dot"></span></td></tr>
+        <tr><td class="rh">[Tiêu chí 2]</td><td></td><td><span class="dot grey"></span></td><td></td><td><span class="dot"></span></td></tr>
+        <tr><td class="rh">[Tiêu chí 3]</td><td></td><td></td><td><span class="dot grey"></span></td><td><span class="dot"></span></td></tr>
+        <tr><td class="rh">[Tiêu chí 4]</td><td><span class="dot grey"></span></td><td></td><td></td><td><span class="dot"></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- layout: figure -->
+<section class="slide l-figure">
+  <svg class="deco" style="left:799.8px;top:487.3px;width:160.2px;height:53.4px"><use href="#m16a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:-83.8px;top:461.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">[Tiêu đề hình]</h2>
+  <div class="fig"><div class="ph">[HÌNH / BIỂU ĐỒ: inline SVG hoặc &lt;img class="fig-img"&gt;]</div></div>
+  <p class="figcap">[Chú thích ngắn. Nguồn: Tác giả (năm), Hình x.y.]</p>
+  <div class="side">
+    <div class="kv"><div class="v">[93%]</div><p>[Ý nghĩa của số liệu, tối đa 12 từ]</p></div>
+    <div class="kv"><div class="v">[1.024]</div><p>[Ý nghĩa của số liệu, tối đa 12 từ]</p></div>
+    <p>[Một câu kết luận ngắn, tối đa 20 từ.]</p>
+  </div>
+</section>
+
+<!-- layout: timeline -->
+<section class="slide l-timeline">
+  <svg class="deco" style="left:0px;top:488px;width:142.0px;height:53.5px"><use href="#m15a"/></svg>
+  <svg class="deco" style="left:10.9px;top:12.8px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:901.3px;top:208.3px;width:164.2px;height:164.1px"><use href="#m15c"/></svg>
+  <h2 class="title">[Tiêu đề dòng thời gian]</h2>
+  <div class="axis"></div>
+  <div class="zz">
+    <div class="st up"><div class="it"><p>[Mô tả ngắn mốc 1]</p><div class="h3">[Mốc 1]</div></div><div class="num">01</div></div>
+    <div class="st dn"><div class="num">02</div><div class="it"><div class="h3">[Mốc 2]</div><p>[Mô tả ngắn mốc 2]</p></div></div>
+    <div class="st up"><div class="it"><p>[Mô tả ngắn mốc 3]</p><div class="h3">[Mốc 3]</div></div><div class="num">03</div></div>
+    <div class="st dn"><div class="num">04</div><div class="it"><div class="h3">[Mốc 4]</div><p>[Mô tả ngắn mốc 4]</p></div></div>
+    <div class="st up"><div class="it"><p>[Mô tả ngắn mốc 5]</p><div class="h3">[Mốc 5]</div></div><div class="num">05</div></div>
+  </div>
+</section>
+
+<!-- layout: hub -->
+<section class="slide l-hub">
+  <svg class="deco" style="left:-0.2px;top:461.5px;width:237.7px;height:79.2px"><use href="#m5a"/></svg>
+  <svg class="deco" style="left:910.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m5b"/></svg>
+  <svg class="deco" style="left:879.2px;top:461.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <h2 class="title">[Tiêu đề sơ đồ]</h2>
+  <div class="core"><div class="h3">[Hệ thống]</div></div>
+  <div class="ln" style="left:479px;top:204px;width:2px;height:24px"></div>
+  <div class="ln" style="left:479px;top:320px;width:2px;height:32px"></div>
+  <div class="ln" style="left:344px;top:196px;width:2px;height:124px"></div>
+  <div class="ln" style="left:344px;top:273px;width:28px;height:2px"></div>
+  <div class="ln" style="left:614px;top:196px;width:2px;height:124px"></div>
+  <div class="ln" style="left:588px;top:273px;width:28px;height:2px"></div>
+  <div class="it top"><div class="h3">[Phần 1]</div><p>[Mô tả rất ngắn]</p></div>
+  <div class="it l1"><div class="h3">[Phần 2]</div><p>[Mô tả rất ngắn]</p></div>
+  <div class="it r1"><div class="h3">[Phần 3]</div><p>[Mô tả rất ngắn]</p></div>
+  <div class="it l2"><div class="h3">[Phần 4]</div><p>[Mô tả rất ngắn]</p></div>
+  <div class="it r2"><div class="h3">[Phần 5]</div><p>[Mô tả rất ngắn]</p></div>
+  <div class="it bot"><div class="h3">[Phần 6]</div><p>[Mô tả rất ngắn]</p></div>
+</section>
+
+<!-- layout: stairs -->
+<section class="slide l-stairs">
+  <svg class="deco" style="left:-0.2px;top:461.5px;width:237.7px;height:79.2px"><use href="#m5a"/></svg>
+  <svg class="deco" style="left:910.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m5b"/></svg>
+  <svg class="deco" style="left:879.2px;top:461.5px;width:164.2px;height:164.2px"><use href="#m25a"/></svg>
+  <h2 class="title">[Lộ trình phát triển]</h2>
+  <div class="zz">
+    <div class="lv">[Mức 1]</div><div class="lv">[Mức 2]</div><div class="lv">[Mức 3]</div><div class="lv">[Mức 4]</div>
+  </div>
+  <div class="zz">
+    <div class="it"><div class="h3">[Giai đoạn 1]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Giai đoạn 2]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Giai đoạn 3]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+    <div class="it"><div class="h3">[Giai đoạn 4]</div><p>[Mô tả ngắn, tối đa 10 từ]</p></div>
+  </div>
+</section>
+
+<!-- layout: gantt -->
+<section class="slide l-gantt">
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:878.4px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">Kế hoạch thực hiện</h2>
+  <div class="g" style="--m:6">
+    <div></div><div class="mo">Th 1</div><div class="mo">Th 2</div><div class="mo">Th 3</div><div class="mo">Th 4</div><div class="mo">Th 5</div><div class="mo">Th 6</div>
+    <div class="ph-l">[Giai đoạn 1]</div><div class="bar" style="grid-column:2 / span 2"><span>[Việc 1]</span><span>[Việc 2]</span></div>
+    <div class="ph-l">[Giai đoạn 2]</div><div class="bar cyan" style="grid-column:3 / span 3"><span>[Việc 1]</span><span>[Việc 2]</span></div>
+    <div class="ph-l">[Giai đoạn 3]</div><div class="bar" style="grid-column:5 / span 3"><span>[Việc 1]</span><span>[Việc 2]</span></div>
+  </div>
+</section>
+
+<!-- layout: team -->
+<section class="slide l-team">
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:916.5px;top:221.2px;width:30.9px;height:97.5px"><use href="#m1b"/></svg>
+  <svg class="deco" style="left:-80.1px;top:87.4px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">Thành viên nhóm</h2>
+  <div class="grid">
+    <div class="m"><div class="face"><div class="ph">[ẢNH]</div></div><div class="h4">[Thành viên 1]</div><p>[Vai trò 1]</p></div>
+    <div class="m"><div class="face"><div class="ph">[ẢNH]</div></div><div class="h4">[Thành viên 2]</div><p>[Vai trò 2]</p></div>
+    <div class="m"><div class="face"><div class="ph">[ẢNH]</div></div><div class="h4">[Thành viên 3]</div><p>[Vai trò 3]</p></div>
+    <div class="m"><div class="face"><div class="ph">[ẢNH]</div></div><div class="h4">[Thành viên 4]</div><p>[Vai trò 4]</p></div>
+  </div>
+</section>
+
+<!-- layout: diagram -->
+<section class="slide l-diagram">
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:878.4px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <h2 class="title">[Kiến trúc hệ thống]</h2>
+  <div class="stage">
+    <svg width="780" height="300" viewBox="0 0 780 300">
+      <g class="f-none s-cyan" stroke-width="2"><rect x="20" y="115" width="160" height="70"/><rect x="310" y="115" width="160" height="70"/></g>
+      <rect class="f-blue" x="600" y="40" width="160" height="70"/><rect class="f-blue" x="600" y="190" width="160" height="70"/>
+      <g class="s-cyan" stroke-width="2"><line x1="180" y1="150" x2="310" y2="150"/><polyline class="f-none" points="470,150 535,150 535,75 600,75"/><polyline class="f-none" points="535,150 535,225 600,225"/></g>
+      <g class="f-cyan"><path d="M310 150 l-10 -6 v12 z"/><path d="M600 75 l-10 -6 v12 z"/><path d="M600 225 l-10 -6 v12 z"/></g>
+      <g class="f-white" font-size="18" text-anchor="middle"><text x="100" y="156">[Client]</text><text x="390" y="156">[API]</text><text x="680" y="81">[Dịch vụ A]</text><text x="680" y="231">[CSDL]</text></g>
+      <g class="f-cyan" font-size="14" text-anchor="middle"><text x="245" y="140">[HTTPS]</text></g>
+    </svg>
+  </div>
+</section>
+
+<!-- layout: thanks -->
+<section class="slide l-thanks">
+  <svg class="deco" style="left:18.4px;top:22.1px;width:31.0px;height:97.5px"><use href="#m2c"/></svg>
+  <svg class="deco" style="left:878.4px;top:-81.5px;width:164.2px;height:164.2px"><use href="#m1c"/></svg>
+  <svg class="deco" style="left:722.3px;top:461.5px;width:237.7px;height:79.2px"><use href="#m26a"/></svg>
+  <svg class="deco" style="left:0px;top:277.2px;width:87.6px;height:262.8px"><use href="#m29d"/></svg>
+  <div class="ty">
+    <div class="big">Cảm ơn!</div>
+    <p class="ask">Thầy cô và các bạn có câu hỏi nào không?</p>
+    <p>[email]<br>[github/link repo]<br>[link demo]</p>
+    <div class="icons">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <svg class="icon" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+    </div>
+  </div>
+</section>
+<!-- ================= SLIDES END ================= -->
+</main>
+<div class="hud" id="hud"></div>
+<script>
+/* Deck runtime: fit-to-window, ← → / Space / PgUp PgDn / Home End, F = fullscreen, O = overview, #n deep link, P = print */
+(function(){
+  const deck=document.querySelector('.deck'), slides=[...deck.querySelectorAll('.slide')], hud=document.getElementById('hud');
+  let i=0; try{i=Math.min(Math.max((parseInt(location.hash.slice(1))||1)-1,0),slides.length-1)}catch(e){}
+  function fit(){ if(document.body.classList.contains('overview'))return;
+    const s=Math.min(innerWidth/960,innerHeight/540); deck.style.transform=`translate(${(innerWidth-960*s)/2}px,${(innerHeight-540*s)/2}px) scale(${s})`; }
+  function show(n){ i=Math.min(Math.max(n,0),slides.length-1); slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    hud.textContent=(i+1)+' / '+slides.length; try{history.replaceState(null,'','#'+(i+1))}catch(e){} }
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(i+1)}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(i-1)}
+    else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){try{const r=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();r&&r.catch&&r.catch(()=>{})}catch(e){}}
+    else if(e.key==='o'||e.key==='O'){document.body.classList.toggle('overview');fit();slides[i].scrollIntoView({block:'center'})}
+    else if(e.key==='p'||e.key==='P'){print()}
+  });
+  slides.forEach((s,k)=>s.addEventListener('click',()=>{ if(document.body.classList.contains('overview')){document.body.classList.remove('overview');show(k);fit()} }));
+  addEventListener('resize',fit); fit(); show(i);
+})();
+</script>
+</body>
+</html>

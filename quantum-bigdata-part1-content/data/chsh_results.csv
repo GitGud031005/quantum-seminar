@@ -1,0 +1,4 @@
+strategy,win_rate,note
+classical_best,0.75,exhaustive over 16 deterministic strategies
+quantum_simulated,0.8508,"Bell pair, 4096 shots per question pair, Aer seed 7"
+quantum_theory,0.8536,"cos^2(pi/8), the maximum quantum mechanics allows"

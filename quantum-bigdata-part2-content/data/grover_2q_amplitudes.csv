@@ -1,0 +1,5 @@
+state,after_H,after_oracle,after_diffusion
+00,0.5,0.5,0.0
+01,0.5,0.5,0.0
+10,0.5,0.5,0.0
+11,0.5,-0.5,1.0

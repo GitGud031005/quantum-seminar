@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="520" viewBox="0 0 560 520" font-family="DejaVu Sans, Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#111"/></marker></defs>
+<circle cx="280" cy="270" r="190" fill="none" stroke="#111" stroke-width="2.5"/>
+<path d="M 90 270 A 190 60.800000000000004 0 0 1 470 270" fill="none" stroke="#888" stroke-width="1.8" stroke-dasharray="7 6"/>
+<path d="M 90 270 A 190 60.800000000000004 0 0 0 470 270" fill="none" stroke="#111" stroke-width="1.8"/>
+<line x1="280.0" y1="479.0" x2="280.0" y2="32.5" stroke="#888" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="288.0" y="32.5" font-size="20" fill="#555" font-style="italic">z</text>
+<line x1="71.0" y1="270.0" x2="527.0" y2="270.0" stroke="#888" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="533.0" y="275.0" font-size="20" fill="#555" font-style="italic">y</text>
+<line x1="374.1" y1="223.2" x2="156.0" y2="331.7" stroke="#888" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="148.0" y="355.7" font-size="20" fill="#555" font-style="italic">x</text>
+<circle cx="280.0" cy="80.0" r="7" fill="#111"/>
+<text x="266.0" y="64.0" font-size="24" fill="#111">|0⟩</text>
+<circle cx="280.0" cy="460.0" r="7" fill="#111"/>
+<text x="266.0" y="494.0" font-size="24" fill="#111">|1⟩</text>
+<circle cx="194.5" cy="312.6" r="7" fill="#111"/>
+<text x="124.5" y="314.6" font-size="24" fill="#111">|+⟩</text>
+<circle cx="365.5" cy="227.4" r="7" fill="#111"/>
+<text x="377.5" y="215.4" font-size="24" fill="#111">|−⟩</text>
+<path d="M 273.8 97.0 L 267.6 101.7 L 261.4 107.4 L 255.4 114.2 L 249.6 121.9 L 243.9 130.5 L 238.5 140.0 L 233.3 150.3 L 228.4 161.3 L 223.8 173.0 L 219.5 185.3 L 215.7 198.2 L 212.2 211.4 L 209.2 225.0 L 206.5 238.9 L 204.4 253.0 L 202.7 267.2 L 201.5 281.5 L 200.7 295.6" fill="none" stroke="#111" stroke-width="2.5" stroke-dasharray="3 5" marker-end="url(#a)"/>
+<path d="M 286.2 443.0 L 292.4 438.3 L 298.6 432.6 L 304.6 425.8 L 310.4 418.1 L 316.1 409.5 L 321.5 400.0 L 326.7 389.7 L 331.6 378.7 L 336.2 367.0 L 340.5 354.7 L 344.3 341.8 L 347.8 328.6 L 350.8 315.0 L 353.5 301.1 L 355.6 287.0 L 357.3 272.8 L 358.5 258.5 L 359.3 244.4" fill="none" stroke="#111" stroke-width="2.5" stroke-dasharray="3 5" marker-end="url(#a)"/>
+<text x="174.4" y="165.8" font-size="26" font-weight="bold" fill="#111">H</text>
+<text x="355.6" y="384.2" font-size="26" font-weight="bold" fill="#111">H</text>
+</svg>
