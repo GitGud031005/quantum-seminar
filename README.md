@@ -26,7 +26,7 @@ quantum-seminar/
 ├── quantum-bigdata-part2-content/      input + output for Part 2
 ├── quantum-bigdata-part3-content/      input + output for Part 3
 ├── quantum-bigdata-part-template/      empty skeleton for a new part (see below)
-├── EducationalDarkDesignSystem/        the slide skill (design system + deck builder)
+├── .claude/skills/educational-dark-design/   the slide skill (design system + deck builder)
 └── material/                           reference book (local only, not committed)
 ```
 
@@ -65,14 +65,9 @@ Conventions that keep the parts consistent:
 
 ### 1. Install the skill
 
-The skill lives in `EducationalDarkDesignSystem/.claude/skills/educational-dark-design/`. Claude Code only loads skills from the `.claude/skills/` folder of the directory it is opened in, so make it available once:
+Nothing to install. The skill ships in the repo at `.claude/skills/educational-dark-design/`, and Claude Code loads it when opened in the repo root. After `git clone` or `git pull`, open Claude Code in `quantum-seminar/` (restart it if it was already running) and type `/`: `educational-dark-design` should be listed.
 
-```bash
-mkdir -p .claude/skills
-cp -r EducationalDarkDesignSystem/.claude/skills/educational-dark-design .claude/skills/
-```
-
-Open Claude Code in the repo root and restart it if it was already running. Typing `/` should list `educational-dark-design`. Alternatively copy the folder to `~/.claude/skills/` to use it in every project.
+To use the same skill in other projects, copy `.claude/skills/educational-dark-design/` to that project's `.claude/skills/`, or to `~/.claude/skills/` for every project. The skill's own README (in its folder, in Vietnamese) covers installing it in the Claude app and editing the design system.
 
 ### 2. Ask for the deck
 
