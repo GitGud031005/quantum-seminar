@@ -8,6 +8,14 @@ Content, speaker notes and slide decks for a three-part group seminar on Quantum
 | 2 | Gates, circuits and algorithms: Hadamard, CNOT, Grover, Shor | [`quantum-bigdata-part2-content`](quantum-bigdata-part2-content) | `part2-slides.html` / `.pdf` |
 | 3 | Quantum × Big Data: where quantum helps data work, the two bottlenecks, hardware in 2026 | [`quantum-bigdata-part3-content`](quantum-bigdata-part3-content) | `part3-slides.html` / `.pdf` |
 
+## The seminar in short
+
+The talk is about 40 minutes for third-year computer science students with no physics background, and it follows one thread: what makes a quantum computer different, how it computes, and whether that helps with big data.
+
+1. **Foundations.** A qubit holds a mix of 0 and 1, and many qubits together hold a huge amount of information, but reading them gives back very little. Quantum computers work by using three effects, superposition, entanglement and interference, to steer toward the right answer before reading. No formulas; every idea has a picture.
+2. **Gates, circuits and algorithms.** Gates are reversible moves, and a circuit chains them. The speedup comes from interference, where wrong answers cancel and the right one adds up, not from "trying all answers at once". Grover makes search take about √N steps. Shor makes factoring easy and so breaks today's public-key cryptography. A live Grover demo finds the hidden record in a 3-qubit search with a 93% hit rate.
+3. **Quantum × Big Data.** Quantum algorithms map onto four data tasks: search (Grover), machine learning (quantum kernels), linear algebra (HHL) and optimization (QAOA). Two bottlenecks block them today: loading the data into the machine (QRAM) and the fine print behind speedup claims. A small kernel experiment run by the group did not beat classical methods, and hardware in 2026 is still far from terabyte-scale data. The takeaway is to always ask "compared to what?".
+
 ## How this repo works
 
 Each part is built in three steps:
